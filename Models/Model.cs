@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AIDentify.Models
@@ -9,18 +10,21 @@ namespace AIDentify.Models
         [Column ("Id")]
         protected string ModelID { get; set; }
         [Required]
+        [StringLength (50)]
         protected string ModelName { get; set; }
 
         [Required]
         protected object ModelItSelf { get; set; }
 
         [Required]
+        [Range (0, 100)]
         protected string Accuracy { get; set; }
 
+        [StringLength (200)]
         protected string GeneralFeedback { get; set; }
 
 
-        protected Review Review { get; set; }
+        protected List<Review> Review { get; set; }
 
 
     }
