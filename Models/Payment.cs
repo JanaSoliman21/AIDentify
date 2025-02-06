@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AIDentify.Models
 {
@@ -8,8 +9,10 @@ namespace AIDentify.Models
         [Key]
         protected string Id { get; set; }
 
+        [ValidateNever]
         protected Subscriber Subscriber { get; set; }
 
+        [ValidateNever]
         protected WayOfPayment WayOfPayment { get; set; }
 
         [Required]

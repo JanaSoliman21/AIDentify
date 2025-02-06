@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using AIDentify.Models.Enums;
 using Newtonsoft.Json.Converters;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AIDentify.Models
 {
@@ -37,8 +38,9 @@ namespace AIDentify.Models
         [Range (18, 100)]
         protected int Age { get; set; }
 
-        [Required]
+        
         [JsonConverter(typeof(StringEnumConverter))]
+        [ValidateNever]
         protected Gender Gender { get; set; }
     }
 }

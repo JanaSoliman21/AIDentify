@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AIDentify.Models
 {
@@ -23,7 +24,7 @@ namespace AIDentify.Models
         [StringLength (200)]
         protected string GeneralFeedback { get; set; }
 
-
+        [ValidateNever]
         protected List<Review> Review { get; set; }
 
 
