@@ -10,9 +10,6 @@ namespace AIDentify.Models
         protected string Id { get; set; }
 
         [ValidateNever]
-        protected Subscriber Subscriber { get; set; }
-
-        [ValidateNever]
         protected WayOfPayment WayOfPayment { get; set; }
 
         [Required]

@@ -28,5 +28,9 @@ namespace AIDentify.Models
         protected List<Review> Review { get; set; }
 
 
+        [ValidateNever]
+        protected List<Results> Results { get; set; }
+
+
     }
 }
