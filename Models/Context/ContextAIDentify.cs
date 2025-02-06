@@ -1,19 +1,40 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Data.Common;
 
 namespace AIDentify.Models.Context
 {
-    public class ContextAIDentify: DbContext
+    public class ContextAIDentify : DbContext
     {
-       public ContextAIDentify : base() { }
-    //inject
-    public BlogDbContext(DbContextOptions options) : base(options)
-    {
+        public ContextAIDentify() : base() { }
+        public ContextAIDentify(DbContextOptions options) : base(options)
+        {
+
+        }
+
+        public DbSet<Admin> Admin { get; set; }
+        public DbSet<AgeM> AgeM { get; set; }
+        public DbSet<DiseaseM> DiseaseM { get; set; }
+        public DbSet<GenderM> GenderM { get; set; }
+        public DbSet<Model> Model { get; set; }
+        public DbSet<PayDate> PayDate { get; set; }
+        public DbSet<Payment> Payment { get; set; }
+        public DbSet<Plan> Plan { get; set; }
+
+        public DbSet<Report> Report { get; set; }
+
+        public DbSet<Results> Results { get; set; }
+        public DbSet<Review> Review { get; set; }
+        public DbSet<Subscriber> Subscriber { get; set; }
+        public DbSet<Subscription> Subscription { get; set; }
+
+        public DbSet<SystemUpdate> SystemUpdate { get; set; }
+
+        public DbSet<TeethNumberingM> TeethNumberingM { get; set; }
+
+        public DbSet<User> User { get; set; }
 
     }
-    public DbSet<Author> Authors { get; set; }
-    public DbSet<Post> Posts { get; set; }
-    public DbSet<Department> Departments { get; set; }
 }
-}
+

@@ -1,4 +1,7 @@
 
+using AIDentify.Models.Context;
+using Microsoft.EntityFrameworkCore;
+
 namespace AIDentify
 {
     public class Program
@@ -13,6 +16,13 @@ namespace AIDentify
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<ContextAIDentify>(
+            OptionsBuilder =>
+            {
+              OptionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            }
+
+             );
 
             var app = builder.Build();
 
