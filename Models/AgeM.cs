@@ -6,14 +6,11 @@ using Newtonsoft.Json.Converters;
 
 namespace AIDentify.Models
 {
-    public class AgeM : Results
+    public class AgeM : Result
     {
-        [Key]
-        protected string AgeMId { get; set; }
-
         [JsonConverter(typeof(StringEnumConverter))]
         [ValidateNever]
-        protected new Age Result { get; set; }
+        public Age Result { get; set; }
 
     }
 }

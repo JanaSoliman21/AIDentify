@@ -8,37 +8,37 @@ namespace AIDentify.Models
     public class Report
     {
         [Key]
-        protected string Id { get; set; }
+        public string Id { get; set; }
 
-        protected string AgeMId { get; set; }
+        public string AgeMId { get; set; }
         
         [ValidateNever]
         [ForeignKey(nameof(AgeMId))]
-        protected AgeM AgeM { get; set; }
+        public AgeM AgeM { get; set; }
 
-        protected string GenderMId { get; set; }
+        public string GenderMId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(GenderMId))]
-        protected GenderM GenderM { get; set; }
+        public GenderM GenderM { get; set; }
 
-        protected string DiseaseMId { get; set; }
+        public string DiseaseMId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(DiseaseMId))]
-        protected DiseaseM DiseaseM { get; set; }
+        public DiseaseM DiseaseM { get; set; }
 
-        protected string TeethNumberingMId { get; set; }
+        public string TeethNumberingMId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(TeethNumberingMId))]
-        protected TeethNumberingM TeethNumberingM { get; set; }
+        public TeethNumberingM TeethNumberingM { get; set; }
 
-        protected string SubscriberId { get; set; }
+        public string SubscriberId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SubscriberId))]
-        protected Subscriber Subscriber { get; set; }
+        public Subscriber Subscriber { get; set; }
 
     }
 }

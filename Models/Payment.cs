@@ -7,14 +7,14 @@ namespace AIDentify.Models
     public class Payment
     {
         [Key]
-        protected string Id { get; set; }
+        public string Id { get; set; }
 
         [ValidateNever]
-        protected WayOfPayment WayOfPayment { get; set; }
+        public WayOfPayment WayOfPayment { get; set; }
 
         [Required]
         [Range (5, 100)]
-        protected long Amount {  get; set; }
+        public long Amount {  get; set; }
 
     }
 }

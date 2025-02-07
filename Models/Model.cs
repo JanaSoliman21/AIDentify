@@ -8,28 +8,28 @@ namespace AIDentify.Models
     public class Model
     {
         [Key]
-        [Column ("Id")]
-        protected string ModelID { get; set; }
+        [Column("Id")]
+        public string ModelID { get; set; }
         [Required]
         [StringLength (50)]
-        protected string ModelName { get; set; }
+        public string ModelName { get; set; }
 
-        [Required]
-        protected object ModelItSelf { get; set; }
+        /*[Required]
+        public object ModelItSelf { get; set; }*/
 
         [Required]
         [Range (0, 100)]
-        protected string Accuracy { get; set; }
+        public string Accuracy { get; set; }
 
         [StringLength (200)]
-        protected string GeneralFeedback { get; set; }
+        public string GeneralFeedback { get; set; }
 
         [ValidateNever]
-        protected List<Review> Review { get; set; }
+        public List<Review> Review { get; set; }
 
 
         [ValidateNever]
-        protected List<Results> Results { get; set; }
+        public List<Result> Results { get; set; }
 
 
     }

@@ -7,22 +7,22 @@ namespace AIDentify.Models
     public class Subscription
     {
         [Key]
-        protected string Id { get; set; }
+        public string Id { get; set; }
 
-        protected string PlanId { get; set; }
+        public string PlanId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(PlanId))]
-        protected Plan Plan { get; set; }
+        public Plan Plan { get; set; }
 
-        protected string PayDateId { get; set; }
+        public string PayDateId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(PayDateId))]
-        protected PayDate PayDate { get; set; }
+        public PayDate PayDate { get; set; }
 
         [ValidateNever]
-        protected bool IsPaid { get; set; }
+        public bool IsPaid { get; set; }
 
     }
 }

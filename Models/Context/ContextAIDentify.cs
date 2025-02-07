@@ -17,15 +17,15 @@ namespace AIDentify.Models.Context
         public DbSet<AgeM> AgeM { get; set; }
         public DbSet<DiseaseM> DiseaseM { get; set; }
         public DbSet<GenderM> GenderM { get; set; }
-        public DbSet<Model> Model { get; set; }
+        public DbSet<Result> Result { get; set; }
+        public DbSet<Review> Review { get; set; }
+        public DbSet<Model> Models { get; set; }
         public DbSet<PayDate> PayDate { get; set; }
         public DbSet<Payment> Payment { get; set; }
         public DbSet<Plan> Plan { get; set; }
 
         public DbSet<Report> Report { get; set; }
 
-        public DbSet<Results> Results { get; set; }
-        public DbSet<Review> Review { get; set; }
         public DbSet<Subscriber> Subscriber { get; set; }
         public DbSet<Subscription> Subscription { get; set; }
 

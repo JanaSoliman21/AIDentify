@@ -6,15 +6,12 @@ using Newtonsoft.Json.Converters;
 
 namespace AIDentify.Models
 {
-    public class GenderM : Results
+    public class GenderM : Result
     {
-        [Key]
-        protected string GenderMId { get; set; }
-
 
         [JsonConverter(typeof(StringEnumConverter))]
         [ValidateNever]
-        protected new Gender Result { get; set; }
+        public Gender Result { get; set; }
 
     }
 }

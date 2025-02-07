@@ -11,36 +11,36 @@ namespace AIDentify.Models
     {
         [Key]
         [Column("Id")]
-        protected string UserID { get; set; }
+        public string UserID { get; set; }
 
         [Required]
         [MaxLength(30)]
         [MinLength(2)]
-        protected string UserName { get; set; }
+        public string UserName { get; set; }
 
         [Required]
         [MaxLength(20)]
-        protected string FirstName { get; set; }
+        public string FirstName { get; set; }
 
         [Required]
         [MaxLength(20)]
-        protected string LastName { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
-        protected string Email { get; set; }
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        protected string Password { get; set; }
+        public string Password { get; set; }
 
         [Required]
         [Range (18, 100)]
-        protected int Age { get; set; }
+        public int Age { get; set; }
 
         
         [JsonConverter(typeof(StringEnumConverter))]
         [ValidateNever]
-        protected Gender Gender { get; set; }
+        public Gender Gender { get; set; }
     }
 }

@@ -5,18 +5,16 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AIDentify.Models
 {
-    public  abstract class Results
+    public  abstract class Result
     {
         [Key]
-        protected string Id { get; set; }
+        public string Id { get; set; }
 
-        protected string ModelId { get; set; }
+        public string ModelId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(ModelId))]
-        protected Model Model { get; set; }
-
-        protected object Result { get; set; }
+        public Model Model { get; set; }
 
     }
 }

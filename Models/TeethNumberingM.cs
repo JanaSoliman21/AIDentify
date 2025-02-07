@@ -2,11 +2,9 @@
 
 namespace AIDentify.Models
 {
-    public class TeethNumberingM : Results
+    public class TeethNumberingM : Result
     {
-        [Key]
-        protected string TeethNumberingMId { get; set; }
 
-        protected new int Result { get; set; }
+        public int Result { get; set; }
     }
 }

@@ -9,27 +9,27 @@ namespace AIDentify.Models
     public class Plan
     {
         [Key]
-        protected String Id { get; set; }
+        public String Id { get; set; }
 
 
         [JsonConverter(typeof(StringEnumConverter))]
         [ValidateNever]
-        protected Role Role { get; set; }
+        public Role Role { get; set; }
 
         [ValidateNever]
-        protected List<Model> Models { get; set; }
+        public List<Model> Models { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
-        protected DateTime Duration { get; set; }
+        public DateTime Duration { get; set; }
 
         [Required]
         [Range(7,20)]
-        protected long Price { get; set; }
+        public long Price { get; set; }
 
         
         [ValidateNever]
-        protected bool Updateable { get; set; }
+        public bool Updateable { get; set; }
 
 
     }

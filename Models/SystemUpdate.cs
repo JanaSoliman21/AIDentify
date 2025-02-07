@@ -10,19 +10,19 @@ namespace AIDentify.Models
     public class SystemUpdate
     {
         [Key]
-        protected string SystemUpdateId { get; set; }
+        public string SystemUpdateId { get; set; }
 
         [MaxLength(100)]
-        protected string UpdatedDescribtion { get; set; }
+        public string UpdatedDescribtion { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         [ValidateNever]
-        protected UpdateType UpdateType { get; set; }
+        public UpdateType UpdateType { get; set; }
 
-        protected string AdminId { get; set; }
+        public string AdminId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(AdminId))]
-        protected Admin Admin { get; set; }
+        public Admin Admin { get; set; }
     }
 }

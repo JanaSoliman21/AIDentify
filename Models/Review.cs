@@ -8,15 +8,15 @@ namespace AIDentify.Models
     {
         [Key]
         [Column ("id")]
-        protected int ReviewId { get; set; }
+        public int ReviewId { get; set; }
 
         [Required]
-        protected string ReviewItSelf { get; set; }
+        public string ReviewItSelf { get; set; }
 
-        protected string ModelId { get; set; }
+        public string ModelId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(ModelId))]
-        protected Model Model { get; set; }
+        public Model Model { get; set; }
     }
 }

@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AIDentify.Models
 {
-    public class DiseaseM : Results
+    public class DiseaseM : Result
     {
-        [Key]
-        protected string DiseaseMId { get; set; }
-
         [ValidateNever]
-        protected new Byte Result { get; set; }
+        public Byte Result { get; set; }
     }
 }
