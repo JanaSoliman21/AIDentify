@@ -10,7 +10,6 @@ namespace AIDentify.Models
         [Key]
         public string Id { get; set; }
 
-
         [Required]
         public string ResultId { get; set; }
 
