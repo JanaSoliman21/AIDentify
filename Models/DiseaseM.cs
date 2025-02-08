@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace AIDentify.Models
 {
     public class DiseaseM : Result
     {
-        [ValidateNever]
-        public Byte Result { get; set; }
+        public Byte DiseaseValue
+        {
+            get => Enum.Parse<Byte>(ResultValue);
+            set => ResultValue = value.ToString();
+        }
     }
 }

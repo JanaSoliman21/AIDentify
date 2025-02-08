@@ -8,9 +8,12 @@ namespace AIDentify.Models
 {
     public class AgeM : Result
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        [ValidateNever]
-        public Age Result { get; set; }
+        public Age AgeValue
+        {
+            get => Enum.Parse<Age>(ResultValue);
+            set => ResultValue = value.ToString();
+        }
+
 
     }
 }

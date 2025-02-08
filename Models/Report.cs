@@ -10,30 +10,15 @@ namespace AIDentify.Models
         [Key]
         public string Id { get; set; }
 
-        public string AgeMId { get; set; }
-        
-        [ValidateNever]
-        [ForeignKey(nameof(AgeMId))]
-        public AgeM AgeM { get; set; }
 
-        public string GenderMId { get; set; }
+        [Required]
+        public string ResultId { get; set; }
 
         [ValidateNever]
-        [ForeignKey(nameof(GenderMId))]
-        public GenderM GenderM { get; set; }
+        [ForeignKey(nameof(ResultId))]
+        public Result Result { get; set; }
 
-        public string DiseaseMId { get; set; }
-
-        [ValidateNever]
-        [ForeignKey(nameof(DiseaseMId))]
-        public DiseaseM DiseaseM { get; set; }
-
-        public string TeethNumberingMId { get; set; }
-
-        [ValidateNever]
-        [ForeignKey(nameof(TeethNumberingMId))]
-        public TeethNumberingM TeethNumberingM { get; set; }
-
+        [Required]
         public string SubscriberId { get; set; }
 
         [ValidateNever]

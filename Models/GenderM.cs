@@ -8,10 +8,11 @@ namespace AIDentify.Models
 {
     public class GenderM : Result
     {
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        [ValidateNever]
-        public Gender Result { get; set; }
+        public Gender GenderValue
+        {
+            get => Enum.Parse<Gender>(ResultValue);
+            set => ResultValue = value.ToString();
+        }
 
     }
 }

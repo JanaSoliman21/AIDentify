@@ -4,7 +4,10 @@ namespace AIDentify.Models
 {
     public class TeethNumberingM : Result
     {
-
-        public int Result { get; set; }
+        public int TeethNumberingValue
+        {
+            get => Enum.Parse<int>(ResultValue);
+            set => ResultValue = value.ToString();
+        }
     }
 }

@@ -16,5 +16,8 @@ namespace AIDentify.Models
         [ForeignKey(nameof(ModelId))]
         public Model Model { get; set; }
 
+
+        public string ResultValue { get; set; }
+
     }
 }

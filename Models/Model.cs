@@ -14,8 +14,8 @@ namespace AIDentify.Models
         [StringLength (50)]
         public string ModelName { get; set; }
 
-        /*[Required]
-        public object ModelItSelf { get; set; }*/
+        [Required]
+        public byte[] ModelItSelf { get; set; }
 
         [Required]
         [Range (0, 100)]
