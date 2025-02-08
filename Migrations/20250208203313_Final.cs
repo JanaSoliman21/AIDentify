@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AIDentify.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Final : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,6 +58,7 @@ namespace AIDentify.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ModelName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ModelItSelf = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     Accuracy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GeneralFeedback = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     PlanId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -104,11 +105,12 @@ namespace AIDentify.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ModelId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ResultValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    AgeM_Result = table.Column<int>(type: "int", nullable: true),
-                    DiseaseM_Result = table.Column<byte>(type: "tinyint", nullable: true),
-                    Result = table.Column<int>(type: "int", nullable: true),
-                    TeethNumberingM_Result = table.Column<int>(type: "int", nullable: true)
+                    AgeValue = table.Column<int>(type: "int", nullable: true),
+                    DiseaseValue = table.Column<byte>(type: "tinyint", nullable: true),
+                    GenderValue = table.Column<int>(type: "int", nullable: true),
+                    TeethNumberingValue = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -179,36 +181,15 @@ namespace AIDentify.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AgeMId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    GenderMId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DiseaseMId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    TeethNumberingMId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ResultId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     SubscriberId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Report", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Report_Result_AgeMId",
-                        column: x => x.AgeMId,
-                        principalTable: "Result",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Report_Result_DiseaseMId",
-                        column: x => x.DiseaseMId,
-                        principalTable: "Result",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Report_Result_GenderMId",
-                        column: x => x.GenderMId,
-                        principalTable: "Result",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Report_Result_TeethNumberingMId",
-                        column: x => x.TeethNumberingMId,
+                        name: "FK_Report_Result_ResultId",
+                        column: x => x.ResultId,
                         principalTable: "Result",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -246,29 +227,14 @@ namespace AIDentify.Migrations
                 column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Report_AgeMId",
+                name: "IX_Report_ResultId",
                 table: "Report",
-                column: "AgeMId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Report_DiseaseMId",
-                table: "Report",
-                column: "DiseaseMId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Report_GenderMId",
-                table: "Report",
-                column: "GenderMId");
+                column: "ResultId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Report_SubscriberId",
                 table: "Report",
                 column: "SubscriberId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Report_TeethNumberingMId",
-                table: "Report",
-                column: "TeethNumberingMId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Result_ModelId",

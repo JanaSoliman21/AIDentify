@@ -37,6 +37,10 @@ namespace AIDentify.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<byte[]>("ModelItSelf")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("ModelName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -111,15 +115,7 @@ namespace AIDentify.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AgeMId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DiseaseMId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("GenderMId")
+                    b.Property<string>("ResultId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -127,21 +123,11 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("TeethNumberingMId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AgeMId");
-
-                    b.HasIndex("DiseaseMId");
-
-                    b.HasIndex("GenderMId");
+                    b.HasIndex("ResultId");
 
                     b.HasIndex("SubscriberId");
-
-                    b.HasIndex("TeethNumberingMId");
 
                     b.ToTable("Report");
                 });
@@ -159,6 +145,10 @@ namespace AIDentify.Migrations
                     b.Property<string>("ModelId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ResultValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -297,14 +287,8 @@ namespace AIDentify.Migrations
                 {
                     b.HasBaseType("AIDentify.Models.Result");
 
-                    b.Property<int>("Result")
+                    b.Property<int>("AgeValue")
                         .HasColumnType("int");
-
-                    b.ToTable("Result", t =>
-                        {
-                            t.Property("Result")
-                                .HasColumnName("AgeM_Result");
-                        });
 
                     b.HasDiscriminator().HasValue("AgeM");
                 });
@@ -313,14 +297,8 @@ namespace AIDentify.Migrations
                 {
                     b.HasBaseType("AIDentify.Models.Result");
 
-                    b.Property<byte>("Result")
+                    b.Property<byte>("DiseaseValue")
                         .HasColumnType("tinyint");
-
-                    b.ToTable("Result", t =>
-                        {
-                            t.Property("Result")
-                                .HasColumnName("DiseaseM_Result");
-                        });
 
                     b.HasDiscriminator().HasValue("DiseaseM");
                 });
@@ -329,7 +307,7 @@ namespace AIDentify.Migrations
                 {
                     b.HasBaseType("AIDentify.Models.Result");
 
-                    b.Property<int>("Result")
+                    b.Property<int>("GenderValue")
                         .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("GenderM");
@@ -339,14 +317,8 @@ namespace AIDentify.Migrations
                 {
                     b.HasBaseType("AIDentify.Models.Result");
 
-                    b.Property<int>("Result")
+                    b.Property<int>("TeethNumberingValue")
                         .HasColumnType("int");
-
-                    b.ToTable("Result", t =>
-                        {
-                            t.Property("Result")
-                                .HasColumnName("TeethNumberingM_Result");
-                        });
 
                     b.HasDiscriminator().HasValue("TeethNumberingM");
                 });
@@ -386,21 +358,9 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Report", b =>
                 {
-                    b.HasOne("AIDentify.Models.AgeM", "AgeM")
+                    b.HasOne("AIDentify.Models.Result", "Result")
                         .WithMany()
-                        .HasForeignKey("AgeMId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AIDentify.Models.DiseaseM", "DiseaseM")
-                        .WithMany()
-                        .HasForeignKey("DiseaseMId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AIDentify.Models.GenderM", "GenderM")
-                        .WithMany()
-                        .HasForeignKey("GenderMId")
+                        .HasForeignKey("ResultId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -410,21 +370,9 @@ namespace AIDentify.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AIDentify.Models.TeethNumberingM", "TeethNumberingM")
-                        .WithMany()
-                        .HasForeignKey("TeethNumberingMId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AgeM");
-
-                    b.Navigation("DiseaseM");
-
-                    b.Navigation("GenderM");
+                    b.Navigation("Result");
 
                     b.Navigation("Subscriber");
-
-                    b.Navigation("TeethNumberingM");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Result", b =>
