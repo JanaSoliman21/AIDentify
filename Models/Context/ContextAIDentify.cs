@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Data.Common;
 
 namespace AIDentify.Models.Context
 {
-    public class ContextAIDentify : DbContext
+    public class ContextAIDentify : IdentityDbContext<ApplicationUser>
     {
         public ContextAIDentify() : base() { }
         public ContextAIDentify(DbContextOptions options) : base(options)
