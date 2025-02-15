@@ -1,5 +1,9 @@
 
+using System.Text.Json.Serialization;
+using AIDentify.IRepositry;
+using AIDentify.Models;
 using AIDentify.Models.Context;
+using AIDentify.Repositry;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify
@@ -12,7 +16,10 @@ namespace AIDentify
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -23,6 +30,9 @@ namespace AIDentify
             }
 
              );
+
+            builder.Services.AddScoped<IUserRepositry, UserRepositry>();
+
 
             var app = builder.Build();
 

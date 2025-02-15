@@ -2,7 +2,7 @@
 {
     public enum Age
     {
-        Child=0,
-        Adult=1
+        Child,
+        Adult
     }
 }

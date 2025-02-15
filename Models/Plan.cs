@@ -12,7 +12,7 @@ namespace AIDentify.Models
         public String Id { get; set; }
 
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
         public Role Role { get; set; }
 

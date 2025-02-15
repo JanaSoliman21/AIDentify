@@ -38,9 +38,10 @@ namespace AIDentify.Models
         [Range (18, 100)]
         public int Age { get; set; }
 
-        
-        [JsonConverter(typeof(StringEnumConverter))]
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
         public Gender Gender { get; set; }
+
     }
 }

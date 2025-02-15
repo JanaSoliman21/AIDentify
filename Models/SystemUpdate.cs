@@ -15,7 +15,7 @@ namespace AIDentify.Models
         [MaxLength(100)]
         public string UpdatedDescribtion { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
         public UpdateType UpdateType { get; set; }
 

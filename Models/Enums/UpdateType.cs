@@ -2,8 +2,8 @@
 {
     public enum UpdateType
     {
-        User = 0,
-        Plan = 1,
-        Model = 2
+        User,
+        Plan,
+        Model 
     }
 }
