@@ -10,17 +10,23 @@ namespace AIDentify.Models
         [Key]
         public string ScanId { get; set; }
 
-        public string PatientId { get; set; }
+        public string? PatientId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(PatientId))]
-        public Patient Patient { get; set; }
+        public Patient? Patient { get; set; }
 
-        public string DoctorId { get; set; }
+        public string? DoctorId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(DoctorId))]
-        public Doctor Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
+
+        public string? StudentId { get; set; }
+
+        [ValidateNever]
+        [ForeignKey(nameof(StudentId))]
+        public Student? Student { get; set; }
 
         [Required]
         public string ImagePath { get; set; }

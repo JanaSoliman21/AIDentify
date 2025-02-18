@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Context;
-using AIDentify.Repositry;
+//using AIDentify.Repositry;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify

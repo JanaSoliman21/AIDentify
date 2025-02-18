@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    [Migration("20250215194842_Identity")]
-    partial class Identity
+    [Migration("20250218135943_EditedMigration")]
+    partial class EditedMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,29 @@ namespace AIDentify.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AIDentify.Models.Admin", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AdminEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("AdminPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AdminId");
+
+                    b.ToTable("Admin");
+                });
 
             modelBuilder.Entity("AIDentify.Models.ApplicationUser", b =>
                 {
@@ -90,38 +113,89 @@ namespace AIDentify.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Model", b =>
+            modelBuilder.Entity("AIDentify.Models.MedicalHistory", b =>
                 {
-                    b.Property<string>("ModelID")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("Id");
+                    b.Property<string>("MedicalHistoryId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Accuracy")
+                    b.Property<string>("Diagnosis")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GeneralFeedback")
+                    b.Property<string>("PatientId")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<byte[]>("ModelItSelf")
+                    b.Property<int>("TeethCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("XRay")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("ModelName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.HasKey("MedicalHistoryId");
 
-                    b.Property<string>("PlanId")
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("MedicalHistory");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Message", b =>
+                {
+                    b.Property<string>("MessageId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ModelID");
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("PlanId");
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.ToTable("Models");
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Patient", b =>
+                {
+                    b.Property<string>("PatientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DoctorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PatientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("age")
+                        .HasColumnType("int");
+
+                    b.Property<int>("gender")
+                        .HasColumnType("int");
+
+                    b.HasKey("PatientId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("Patient");
                 });
 
             modelBuilder.Entity("AIDentify.Models.PayDate", b =>
@@ -137,12 +211,12 @@ namespace AIDentify.Migrations
 
                     b.HasKey("PayDateId");
 
-                    b.ToTable("PayDate");
+                    b.ToTable("payDate");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Payment", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PaymentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<long>("Amount")
@@ -151,111 +225,106 @@ namespace AIDentify.Migrations
                     b.Property<int>("WayOfPayment")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentId");
 
                     b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Plan", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PlanId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Duration")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("MaxPatients")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxScans")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlanName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Updateable")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
+                    b.HasKey("PlanId");
 
                     b.ToTable("Plan");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Report", b =>
+            modelBuilder.Entity("AIDentify.Models.Question", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("QuestionId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ResultId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SubscriberId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ResultId");
-
-                    b.HasIndex("SubscriberId");
-
-                    b.ToTable("Report");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Result", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
-
-                    b.Property<string>("ModelId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ResultValue")
+                    b.Property<string>("CorrectAnswer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModelId");
-
-                    b.ToTable("Result");
-
-                    b.HasDiscriminator().HasValue("Result");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Review", b =>
-                {
-                    b.Property<int>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
-
-                    b.Property<string>("ModelId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ReviewItSelf")
+                    b.PrimitiveCollection<string>("Options")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ReviewId");
+                    b.Property<string>("QuizId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("ModelId");
+                    b.Property<string>("TheQuestion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Review");
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("Question");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Quiz", b =>
+                {
+                    b.Property<string>("QuizId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("QuizId");
+
+                    b.ToTable("Quiz");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.QuizAttempt", b =>
+                {
+                    b.Property<string>("QuizAttemptId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuizId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.PrimitiveCollection<string>("SelectedAnswers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("QuizAttemptId");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("QuizAttempt");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Subscription", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsPaid")
@@ -269,7 +338,7 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("SubscriptionId");
 
                     b.HasIndex("PayDateId");
 
@@ -302,19 +371,36 @@ namespace AIDentify.Migrations
                     b.ToTable("SystemUpdate");
                 });
 
+            modelBuilder.Entity("AIDentify.Models.TrendingNews", b =>
+                {
+                    b.Property<string>("NewsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("NewsId");
+
+                    b.ToTable("TrendingNews");
+                });
+
             modelBuilder.Entity("AIDentify.Models.User", b =>
                 {
                     b.Property<string>("UserID")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("Id");
-
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -325,9 +411,6 @@ namespace AIDentify.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -337,6 +420,17 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubscriptionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -344,11 +438,60 @@ namespace AIDentify.Migrations
 
                     b.HasKey("UserID");
 
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("SubscriptionId");
+
                     b.ToTable("User");
 
                     b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("AIDentify.Models.XRayScan", b =>
+                {
+                    b.Property<string>("ScanId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("DiseasePrediction")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PredictedAgeGroup")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PredictedGenderGroup")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ScanDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StudentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TeethCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("ScanId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("XRayScan");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -484,118 +627,99 @@ namespace AIDentify.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("AIDentify.Models.AgeM", b =>
-                {
-                    b.HasBaseType("AIDentify.Models.Result");
-
-                    b.Property<int>("AgeValue")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("AgeM");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.DiseaseM", b =>
-                {
-                    b.HasBaseType("AIDentify.Models.Result");
-
-                    b.Property<byte>("DiseaseValue")
-                        .HasColumnType("tinyint");
-
-                    b.HasDiscriminator().HasValue("DiseaseM");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.GenderM", b =>
-                {
-                    b.HasBaseType("AIDentify.Models.Result");
-
-                    b.Property<int>("GenderValue")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("GenderM");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.TeethNumberingM", b =>
-                {
-                    b.HasBaseType("AIDentify.Models.Result");
-
-                    b.Property<int>("TeethNumberingValue")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("TeethNumberingM");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Admin", b =>
+            modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
                     b.HasBaseType("AIDentify.Models.User");
 
-                    b.HasDiscriminator().HasValue("Admin");
+                    b.Property<string>("ClinicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Doctor");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Subscriber", b =>
+            modelBuilder.Entity("AIDentify.Models.Student", b =>
                 {
                     b.HasBaseType("AIDentify.Models.User");
 
-                    b.Property<string>("PaymentId")
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalPOintsEarned")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("University")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SubscriptionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("PaymentId");
-
-                    b.HasIndex("SubscriptionId");
-
-                    b.HasDiscriminator().HasValue("Subscriber");
+                    b.HasDiscriminator().HasValue("Student");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Model", b =>
+            modelBuilder.Entity("AIDentify.Models.MedicalHistory", b =>
                 {
-                    b.HasOne("AIDentify.Models.Plan", null)
-                        .WithMany("Models")
-                        .HasForeignKey("PlanId");
+                    b.HasOne("AIDentify.Models.Patient", "Patient")
+                        .WithMany("MedicalHistories")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Report", b =>
+            modelBuilder.Entity("AIDentify.Models.Message", b =>
                 {
-                    b.HasOne("AIDentify.Models.Result", "Result")
+                    b.HasOne("AIDentify.Models.User", "Receiver")
                         .WithMany()
-                        .HasForeignKey("ResultId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AIDentify.Models.Subscriber", "Subscriber")
-                        .WithMany("Reports")
-                        .HasForeignKey("SubscriberId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("AIDentify.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Result");
+                    b.Navigation("Receiver");
 
-                    b.Navigation("Subscriber");
+                    b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Result", b =>
+            modelBuilder.Entity("AIDentify.Models.Patient", b =>
                 {
-                    b.HasOne("AIDentify.Models.Model", "Model")
-                        .WithMany("Results")
-                        .HasForeignKey("ModelId")
+                    b.HasOne("AIDentify.Models.Doctor", "Doctor")
+                        .WithMany("patients")
+                        .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Model");
+                    b.Navigation("Doctor");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Review", b =>
+            modelBuilder.Entity("AIDentify.Models.Question", b =>
                 {
-                    b.HasOne("AIDentify.Models.Model", "Model")
-                        .WithMany("Review")
-                        .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("AIDentify.Models.Quiz", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.QuizAttempt", b =>
+                {
+                    b.HasOne("AIDentify.Models.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Model");
+                    b.HasOne("AIDentify.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Subscription", b =>
@@ -603,13 +727,13 @@ namespace AIDentify.Migrations
                     b.HasOne("AIDentify.Models.PayDate", "PayDate")
                         .WithMany()
                         .HasForeignKey("PayDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AIDentify.Models.Plan", "Plan")
                         .WithMany()
                         .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("PayDate");
@@ -626,6 +750,49 @@ namespace AIDentify.Migrations
                         .IsRequired();
 
                     b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.User", b =>
+                {
+                    b.HasOne("AIDentify.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AIDentify.Models.Subscription", "Subscription")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.XRayScan", b =>
+                {
+                    b.HasOne("AIDentify.Models.Doctor", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -679,45 +846,24 @@ namespace AIDentify.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Subscriber", b =>
-                {
-                    b.HasOne("AIDentify.Models.Payment", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AIDentify.Models.Subscription", "Subscription")
-                        .WithMany()
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Payment");
-
-                    b.Navigation("Subscription");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Model", b =>
-                {
-                    b.Navigation("Results");
-
-                    b.Navigation("Review");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Plan", b =>
-                {
-                    b.Navigation("Models");
-                });
-
             modelBuilder.Entity("AIDentify.Models.Admin", b =>
                 {
                     b.Navigation("SystemUpdates");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Subscriber", b =>
+            modelBuilder.Entity("AIDentify.Models.Patient", b =>
                 {
-                    b.Navigation("Reports");
+                    b.Navigation("MedicalHistories");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Quiz", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Doctor", b =>
+                {
+                    b.Navigation("patients");
                 });
 #pragma warning restore 612, 618
         }
