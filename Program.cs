@@ -31,7 +31,7 @@ namespace AIDentify
 
              );
 
-            builder.Services.AddScoped<IUserRepositry, UserRepositry>();
+            //builder.Services.AddScoped<IUserRepositry, UserRepositry>();
 
 
             var app = builder.Build();

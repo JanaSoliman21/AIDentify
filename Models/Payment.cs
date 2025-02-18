@@ -8,7 +8,7 @@ namespace AIDentify.Models
     public class Payment
     {
         [Key]
-        public string Id { get; set; }
+        public string PaymentId { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]

@@ -10,7 +10,6 @@ namespace AIDentify.Models
     public class User
     {
         [Key]
-        [Column("Id")]
         public string UserID { get; set; }
 
         [Required]
@@ -34,14 +33,21 @@ namespace AIDentify.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Required]
-        [Range (18, 100)]
-        public int Age { get; set; }
-
-
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
-        public Gender Gender { get; set; }
+        public Role Role { get; set; }
+
+        public string SubscriptionId { get; set; }
+
+        [ValidateNever]
+        [ForeignKey(nameof(SubscriptionId))]
+        public Subscription Subscription { get; set; }
+
+        public string PaymentId { get; set; }
+
+        [ValidateNever]
+        [ForeignKey(nameof(PaymentId))]
+        public Payment Payment { get; set; }
 
     }
 }

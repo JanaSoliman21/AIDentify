@@ -7,7 +7,7 @@ namespace AIDentify.Models
     public class Subscription
     {
         [Key]
-        public string Id { get; set; }
+        public string SubscriptionId { get; set; }
 
         public string PlanId { get; set; }
 

@@ -9,28 +9,24 @@ namespace AIDentify.Models
     public class Plan
     {
         [Key]
-        public String Id { get; set; }
+        public string PlanId { get; set; }
 
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        [ValidateNever]
-        public Role Role { get; set; }
-
-        [ValidateNever]
-        public List<Model> Models { get; set; }
+        [Required]
+        public string PlanName { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
         public DateTime Duration { get; set; }
 
         [Required]
+        public int MaxScans { get; set; }
+
+        [Required]
+        public int MaxPatients { get; set; }
+
+        [Required]
         [Range(7,20)]
         public long Price { get; set; }
-
-        
-        [ValidateNever]
-        public bool Updateable { get; set; }
-
 
     }
 }
