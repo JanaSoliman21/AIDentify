@@ -11,7 +11,6 @@ namespace AIDentify.Models
         [Required]
         public int Level { get; set; }
 
-        [Required]
-        public long TotalPOintsEarned { get; set; }
+        public long? TotalPOintsEarned { get; set; }
     }
 }

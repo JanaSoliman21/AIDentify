@@ -9,6 +9,6 @@ namespace AIDentify.Models
         public string ClinicName {  get; set; }
 
         [ValidateNever]
-        public List<Patient> patients { get; set; }
+        public List<Patient>? patients { get; set; }
     }
 }

@@ -33,9 +33,6 @@ namespace AIDentify.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        [ValidateNever]
-        public Role Role { get; set; }
 
         public string SubscriptionId { get; set; }
 
