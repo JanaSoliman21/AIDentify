@@ -1,8 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using AIDentify.Models.Enums;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Newtonsoft.Json.Converters;
 
 namespace AIDentify.Models
 {
@@ -15,8 +11,13 @@ namespace AIDentify.Models
         public string PlanName { get; set; }
 
         [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime Duration { get; set; }
+        public int Duration { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime EndDate { get; set; }
 
         [Required]
         public int MaxScans { get; set; }

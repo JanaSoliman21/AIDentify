@@ -6,25 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AIDentify.Migrations
 {
     /// <inheritdoc />
-    public partial class EditedMigration : Migration
+    public partial class Fixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Admin",
-                columns: table => new
-                {
-                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AdminName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    AdminEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdminPassword = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admin", x => x.AdminId);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -44,6 +30,11 @@ namespace AIDentify.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    University = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Level = table.Column<int>(type: "int", nullable: true),
+                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -96,7 +87,9 @@ namespace AIDentify.Migrations
                 {
                     PlanId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Duration = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MaxScans = table.Column<int>(type: "int", nullable: false),
                     MaxPatients = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false)
@@ -129,26 +122,6 @@ namespace AIDentify.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TrendingNews", x => x.NewsId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SystemUpdate",
-                columns: table => new
-                {
-                    SystemUpdateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UpdatedDescribtion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UpdateType = table.Column<int>(type: "int", nullable: false),
-                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SystemUpdate", x => x.SystemUpdateId);
-                    table.ForeignKey(
-                        name: "FK_SystemUpdate_Admin_AdminId",
-                        column: x => x.AdminId,
-                        principalTable: "Admin",
-                        principalColumn: "AdminId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -262,8 +235,8 @@ namespace AIDentify.Migrations
                 columns: table => new
                 {
                     SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PlanId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PayDateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlanId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PayDateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -313,9 +286,8 @@ namespace AIDentify.Migrations
                     LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false),
-                    SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PaymentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PaymentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     University = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -344,8 +316,8 @@ namespace AIDentify.Migrations
                 columns: table => new
                 {
                     MessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Context = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -374,7 +346,7 @@ namespace AIDentify.Migrations
                     PatientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     age = table.Column<int>(type: "int", nullable: false),
                     gender = table.Column<int>(type: "int", nullable: false),
-                    DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -383,8 +355,7 @@ namespace AIDentify.Migrations
                         name: "FK_Patient_User_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "User",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "UserID");
                 });
 
             migrationBuilder.CreateTable(
@@ -392,8 +363,8 @@ namespace AIDentify.Migrations
                 columns: table => new
                 {
                     QuizAttemptId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    QuizId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    QuizId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SelectedAnswers = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PointsEarned = table.Column<int>(type: "int", nullable: false)
                 },
@@ -415,11 +386,30 @@ namespace AIDentify.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SystemUpdate",
+                columns: table => new
+                {
+                    SystemUpdateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UpdatedDescribtion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UpdateType = table.Column<int>(type: "int", nullable: false),
+                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemUpdate", x => x.SystemUpdateId);
+                    table.ForeignKey(
+                        name: "FK_SystemUpdate_User_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "User",
+                        principalColumn: "UserID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MedicalHistory",
                 columns: table => new
                 {
                     MedicalHistoryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     XRay = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     Diagnosis = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeethCount = table.Column<int>(type: "int", nullable: false),
@@ -432,8 +422,7 @@ namespace AIDentify.Migrations
                         name: "FK_MedicalHistory_Patient_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patient",
-                        principalColumn: "PatientId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PatientId");
                 });
 
             migrationBuilder.CreateTable(
@@ -636,9 +625,6 @@ namespace AIDentify.Migrations
 
             migrationBuilder.DropTable(
                 name: "Quiz");
-
-            migrationBuilder.DropTable(
-                name: "Admin");
 
             migrationBuilder.DropTable(
                 name: "Patient");

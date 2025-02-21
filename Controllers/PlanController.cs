@@ -1,12 +1,10 @@
 ﻿using AIDentify.IRepositry;
 using AIDentify.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Expressions;
-using System.Numerics;
 
 namespace AIDentify.Controllers
 {
-    [Route("api/plan/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PlanController: ControllerBase
     {
@@ -14,7 +12,7 @@ namespace AIDentify.Controllers
 
         public PlanController(IPlanRepository planRepository)
         {
-            this.PlanRepository = planRepository;
+            PlanRepository = planRepository;
         }
 
         [HttpGet]

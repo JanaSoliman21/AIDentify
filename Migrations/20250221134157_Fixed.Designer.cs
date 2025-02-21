@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    [Migration("20250221122856_Fixed")]
+    [Migration("20250221134157_Fixed")]
     partial class Fixed
     {
         /// <inheritdoc />
@@ -228,7 +228,10 @@ namespace AIDentify.Migrations
                     b.Property<string>("PlanId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Duration")
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("MaxPatients")
@@ -243,6 +246,9 @@ namespace AIDentify.Migrations
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("PlanId");
 

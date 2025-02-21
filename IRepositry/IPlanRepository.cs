@@ -1,6 +1,5 @@
 ﻿using AIDentify.Models;
 using AIDentify.Models.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify.IRepositry
 {
