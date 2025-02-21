@@ -7,8 +7,6 @@ namespace AIDentify.Models
 {
     public class Admin : User
     {
-        
-
         [ValidateNever]
         public List<SystemUpdate> SystemUpdates { get; set; }
     }

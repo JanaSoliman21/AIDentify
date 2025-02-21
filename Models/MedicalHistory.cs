@@ -9,11 +9,11 @@ namespace AIDentify.Models
         [Key]
         public string MedicalHistoryId { get; set; }
 
-        public string PatientId { get; set; }
+        public string? PatientId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(PatientId))]
-        public Patient Patient { get; set; }
+        public Patient? Patient { get; set; }
 
         [ValidateNever]
         public byte[] XRay { get; set; }

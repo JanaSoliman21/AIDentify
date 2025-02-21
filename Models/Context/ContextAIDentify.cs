@@ -87,23 +87,32 @@ namespace AIDentify.Models.Context
 
         public override int SaveChanges()
         {
-            foreach (var entry in ChangeTracker.Entries<XRayScan>())
+            try
             {
-                var scan = entry.Entity;
-
-                if (!string.IsNullOrEmpty(scan.DoctorId) && string.IsNullOrEmpty(scan.PatientId))
+                foreach (var entry in ChangeTracker.Entries<XRayScan>())
                 {
-                    throw new Exception("If DoctorId is provided, PatientId must be provided too.");
+                    var scan = entry.Entity;
+
+                    if (!string.IsNullOrEmpty(scan.DoctorId) && string.IsNullOrEmpty(scan.PatientId))
+                    {
+                        throw new Exception("If DoctorId is provided, PatientId must be provided too.");
+                    }
+
+                    if (!string.IsNullOrEmpty(scan.StudentId) && (!string.IsNullOrEmpty(scan.DoctorId) || !string.IsNullOrEmpty(scan.PatientId)))
+                    {
+                        throw new Exception("Student scans must not have DoctorId or PatientId.");
+                    }
                 }
 
-                if (!string.IsNullOrEmpty(scan.StudentId) && (!string.IsNullOrEmpty(scan.DoctorId) || !string.IsNullOrEmpty(scan.PatientId)))
-                {
-                    throw new Exception("Student scans must not have DoctorId or PatientId.");
-                }
+                return base.SaveChanges();
             }
-
-            return base.SaveChanges();
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in SaveChanges: {ex.Message}");
+                throw;
+            }
         }
+
 
         public DbSet<Admin> Admin { get; set; }
         public DbSet<Doctor> Doctor { get; set; }

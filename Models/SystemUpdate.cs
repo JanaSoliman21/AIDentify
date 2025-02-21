@@ -19,10 +19,10 @@ namespace AIDentify.Models
         [ValidateNever]
         public UpdateType UpdateType { get; set; }
 
-        public string AdminId { get; set; }
+        public string? AdminId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(AdminId))]
-        public Admin Admin { get; set; }
+        public Admin? Admin { get; set; }
     }
 }

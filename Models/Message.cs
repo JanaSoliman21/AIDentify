@@ -9,17 +9,17 @@ namespace AIDentify.Models
         [Key]
         public string MessageId { get; set; }
 
-        public string SenderId { get; set; }
+        public string? SenderId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SenderId))]
-        public User Sender { get; set; }
+        public User? Sender { get; set; }
 
-        public string ReceiverId { get; set; }
+        public string? ReceiverId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(ReceiverId))]
-        public User Receiver { get; set; }
+        public User? Receiver { get; set; }
 
         [Required]
         public string Context { get; set; }

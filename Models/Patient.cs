@@ -19,11 +19,11 @@ namespace AIDentify.Models
         [ValidateNever]
         public Gender gender { get; set; }
 
-        public string DoctorId { get; set; }
+        public string? DoctorId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(DoctorId))]
-        public Doctor Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
 
         [ValidateNever]
         public List<MedicalHistory> MedicalHistories { get; set; }

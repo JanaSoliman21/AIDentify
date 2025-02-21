@@ -9,17 +9,17 @@ namespace AIDentify.Models
         [Key]
         public string QuizAttemptId { get; set; }
 
-        public string StudentId { get; set; }
+        public string? StudentId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(StudentId))]
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
 
-        public string QuizId { get; set; }
+        public string? QuizId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(QuizId))]
-        public Quiz Quiz { get; set; }
+        public Quiz? Quiz { get; set; }
 
         [Required]
         public List<string> SelectedAnswers { get; set; }

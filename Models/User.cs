@@ -34,17 +34,17 @@ namespace AIDentify.Models
         public string Password { get; set; }
 
 
-        public string SubscriptionId { get; set; }
+        public string? SubscriptionId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SubscriptionId))]
-        public Subscription Subscription { get; set; }
+        public Subscription? Subscription { get; set; }
 
-        public string PaymentId { get; set; }
+        public string? PaymentId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(PaymentId))]
-        public Payment Payment { get; set; }
+        public Payment? Payment { get; set; }
 
     }
 }
