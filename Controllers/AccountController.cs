@@ -261,7 +261,7 @@ namespace AIDentify.Controllers
 
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = $"{Request.Scheme}://{Request.Host}/api/auth/reset-password?token={resetToken}&email={model.Email}";
+            var resetLink = $"{Request.Scheme}://{Request.Host}/api/Account/reset-password?token={resetToken}&email={model.Email}";
 
             return Ok(new { message = "Password reset link generated", resetLink });
         }

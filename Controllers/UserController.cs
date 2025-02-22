@@ -25,6 +25,7 @@ namespace AIDentify.Controllers
             this.context = context;
             
         }
+        [Authorize(Roles ="Admin")]
         [HttpGet("GetAllDoctors")]
         public async Task<IActionResult> GetAllDoctor()
         {
@@ -33,6 +34,7 @@ namespace AIDentify.Controllers
             return Ok(doctors);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllStudents")]
         public async Task<IActionResult> GetAllStudent()
         {
@@ -40,6 +42,8 @@ namespace AIDentify.Controllers
             var student = userA.GetAllStudents();
             return Ok(student);
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllAdmins")]
         public async Task<IActionResult> GetAllAdmins()
         {
@@ -124,16 +128,20 @@ namespace AIDentify.Controllers
                 return NotFound(new { message = "User not found" });
 
             var roles = await userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault(); 
+            var role = roles.FirstOrDefault(); // Assuming one role per user
 
-            user.FirstName = profile.FirstName ?? user.FirstName;
-            user.LastName = profile.LastName ?? user.LastName;
-            user.UserName = profile.UserName ?? user.UserName;
-            user.Email = profile.Email ?? user.Email;
+            // Logging for Debugging
+            Console.WriteLine($"Updating User: {user.Id}, Role: {role}");
+
+            // Ensure fields are only updated if they are non-empty
+            user.FirstName = !string.IsNullOrWhiteSpace(profile.FirstName) ? profile.FirstName : user.FirstName;
+            user.LastName = !string.IsNullOrWhiteSpace(profile.LastName) ? profile.LastName : user.LastName;
+            user.UserName = !string.IsNullOrWhiteSpace(profile.UserName) ? profile.UserName : user.UserName;
+            user.Email = !string.IsNullOrWhiteSpace(profile.Email) ? profile.Email : user.Email;
 
             if (role == "Doctor")
             {
-                user.ClinicName = profile.ClinicName ?? user.ClinicName;
+                user.ClinicName = !string.IsNullOrWhiteSpace(profile.ClinicName) ? profile.ClinicName : user.ClinicName;
 
                 var doctor = await context.Doctor.FirstOrDefaultAsync(d => d.Doctor_ID == user.Id);
                 if (doctor != null)
@@ -144,13 +152,13 @@ namespace AIDentify.Controllers
                     doctor.Email = user.Email;
                     doctor.ClinicName = user.ClinicName;
 
-                    context.Doctor.Update(doctor);
+                    context.Entry(doctor).State = EntityState.Modified; // Proper tracking
                 }
             }
             else if (role == "Student")
             {
-                user.University = profile.University ?? user.University;
-                user.Level = profile.Level ?? user.Level;
+                user.University = !string.IsNullOrWhiteSpace(profile.University) ? profile.University : user.University;
+                user.Level = profile.Level.HasValue ? profile.Level.Value : user.Level; // Proper handling for nullable int
 
                 var student = await context.Student.FirstOrDefaultAsync(s => s.Student_ID == user.Id);
                 if (student != null)
@@ -160,9 +168,9 @@ namespace AIDentify.Controllers
                     student.UserName = user.UserName;
                     student.Email = user.Email;
                     student.University = user.University;
-                    student.Level = (int)user.Level;
+                    student.Level = user.Level ?? student.Level;
 
-                    context.Student.Update(student);
+                    context.Entry(student).State = EntityState.Modified;
                 }
             }
             else if (role == "Admin")
@@ -175,7 +183,7 @@ namespace AIDentify.Controllers
                     admin.UserName = user.UserName;
                     admin.Email = user.Email;
 
-                    context.Admin.Update(admin);
+                    context.Entry(admin).State = EntityState.Modified;
                 }
             }
             else
@@ -183,13 +191,18 @@ namespace AIDentify.Controllers
                 return BadRequest(new { message = "Role not recognized" });
             }
 
+            // ✅ Save changes
             await context.SaveChangesAsync();
 
             var result = await userManager.UpdateAsync(user);
             if (result.Succeeded)
+            {
+                Console.WriteLine("Profile updated successfully.");
                 return Ok(new { message = "Profile updated successfully" });
+            }
 
             return BadRequest(result.Errors);
         }
+
     }
 }
