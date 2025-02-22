@@ -5,8 +5,32 @@ using System.Numerics;
 
 namespace AIDentify.Models
 {
-    public class Admin : User
+    public class Admin 
     {
+        [Key]
+        public string Admin_ID { get; set; }
+
+        [Required]
+        [MaxLength(30)]
+        [MinLength(2)]
+        public string UserName { get; set; }
+
+        [Required]
+        [MaxLength(20)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(20)]
+        public string LastName { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
         [ValidateNever]
         public List<SystemUpdate> SystemUpdates { get; set; }
     }

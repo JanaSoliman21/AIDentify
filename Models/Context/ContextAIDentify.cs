@@ -19,14 +19,28 @@ namespace AIDentify.Models.Context
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany()
-                .HasForeignKey(m => m.SenderId)
+                .HasForeignKey(m => m.SenderIdD)
                 .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Receiver)
                 .WithMany()
-                .HasForeignKey(m => m.ReceiverId)
+                .HasForeignKey(m => m.ReceiverIdD)
                 .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderIdS)
+                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverIdS)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
 
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Patient)
@@ -70,17 +84,7 @@ namespace AIDentify.Models.Context
                 .HasForeignKey(x => x.PlanId)
                 .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
 
-            modelBuilder.Entity<User>()
-                .HasOne(x => x.Subscription)
-                .WithMany()
-                .HasForeignKey(x => x.SubscriptionId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
-
-            modelBuilder.Entity<User>()
-                .HasOne(x => x.Payment)
-                .WithMany()
-                .HasForeignKey(x => x.PaymentId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+           
 
             base.OnModelCreating(modelBuilder);
         }
@@ -133,8 +137,6 @@ namespace AIDentify.Models.Context
         public DbSet<SystemUpdate> SystemUpdate { get; set; }
 
         public DbSet<TrendingNews> TrendingNews { get; set; }
-
-        public DbSet<User> User { get; set; }
 
         public DbSet<XRayScan> XRayScan { get; set; }
 

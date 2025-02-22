@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250222152035_UpdateUser")]
+    partial class UpdateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,16 +228,10 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReceiverIdD")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReceiverIdS")
+                    b.Property<string>("ReceiverId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SenderIdD")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderIdS")
+                    b.Property<string>("SenderId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("SentAt")
@@ -242,11 +239,9 @@ namespace AIDentify.Migrations
 
                     b.HasKey("MessageId");
 
-                    b.HasIndex("ReceiverIdS");
+                    b.HasIndex("ReceiverId");
 
-                    b.HasIndex("SenderIdD");
-
-                    b.HasIndex("SenderIdS");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("Message");
                 });
@@ -524,6 +519,49 @@ namespace AIDentify.Migrations
                     b.ToTable("TrendingNews");
                 });
 
+            modelBuilder.Entity("AIDentify.Models.User", b =>
+                {
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SubscriptionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("UserID");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("SubscriptionId");
+
+                    b.ToTable("User");
+                });
+
             modelBuilder.Entity("AIDentify.Models.XRayScan", b =>
                 {
                     b.Property<string>("ScanId")
@@ -728,31 +766,19 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Message", b =>
                 {
-                    b.HasOne("AIDentify.Models.Doctor", "Receiver")
+                    b.HasOne("AIDentify.Models.User", "Receiver")
                         .WithMany()
-                        .HasForeignKey("ReceiverIdS")
+                        .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AIDentify.Models.Student", "ReceiverS")
+                    b.HasOne("AIDentify.Models.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("ReceiverIdS");
-
-                    b.HasOne("AIDentify.Models.Student", "SenderS")
-                        .WithMany()
-                        .HasForeignKey("SenderIdD");
-
-                    b.HasOne("AIDentify.Models.Doctor", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderIdS")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Receiver");
 
-                    b.Navigation("ReceiverS");
-
                     b.Navigation("Sender");
-
-                    b.Navigation("SenderS");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
@@ -827,6 +853,23 @@ namespace AIDentify.Migrations
                         .HasForeignKey("AdminId");
 
                     b.Navigation("Admin");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.User", b =>
+                {
+                    b.HasOne("AIDentify.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Subscription", "Subscription")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("AIDentify.Models.XRayScan", b =>
