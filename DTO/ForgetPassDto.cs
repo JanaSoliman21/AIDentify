@@ -2,5 +2,7 @@
 {
     public class ForgetPassDto
     {
+        public string Email { get; set; }
+
     }
 }

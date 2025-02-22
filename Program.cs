@@ -1,8 +1,11 @@
 
 using System.Text.Json.Serialization;
+using AIDentify.Extension;
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Context;
+using Microsoft.AspNetCore.Identity;
+
 //using AIDentify.Repositry;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,10 +36,17 @@ namespace AIDentify
 
             //builder.Services.AddScoped<IUserRepositry, UserRepositry>();
             builder.Services.AddScoped<IPlanRepository, IPlanRepository>();
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
+                options =>
+                {
+                    options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
+
+                }).AddEntityFrameworkStores<ContextAIDentify>().AddDefaultTokenProviders();//Reset 
+            builder.Services.AddCustomJwtAuth(builder.Configuration);
 
 
             var app = builder.Build();
-
+            app.UseMiddleware<TokenBlacklistMiddleware>();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -46,6 +56,7 @@ namespace AIDentify
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
