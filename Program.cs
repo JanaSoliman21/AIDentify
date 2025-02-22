@@ -4,6 +4,7 @@ using AIDentify.Extension;
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Context;
+using AIDentify.Repositry;
 using Microsoft.AspNetCore.Identity;
 
 //using AIDentify.Repositry;
@@ -34,8 +35,8 @@ namespace AIDentify
 
              );
 
-            //builder.Services.AddScoped<IUserRepositry, UserRepositry>();
-            builder.Services.AddScoped<IPlanRepository, IPlanRepository>();
+            builder.Services.AddScoped<IUserRepositry, UserRepositry>();
+            builder.Services.AddScoped<IPlanRepository, PlanRepositry>();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
                 options =>
                 {

@@ -3,51 +3,14 @@ using AIDentify.Models.Context;
 
 namespace AIDentify.IRepositry
 {
-    public class IPlanRepository
+    public interface IPlanRepository
     {
-        private readonly ContextAIDentify _context;
+        List<Plan> GetAll();
+        Plan? Get(string id);
+        void Add(Plan Plan);
+        void Update(Plan plan);
 
-        public IPlanRepository(ContextAIDentify context)
-        {
-            _context = context;
-        }
-
-        public List<Plan> GetAll()
-        {
-            return _context.Plan.ToList();
-        }
-
-        public Plan? Get(string id)
-        {
-            return _context.Plan.Find(id);
-        }
-        
-        public void Add(Plan Plan)
-        {
-            _context.Plan.Add(Plan);
-            _context.SaveChanges();
-        }
-
-        public void Update(Plan plan)
-        {
-            var existingPlan = _context.Plan.Find(plan.PlanId);
-
-            if (existingPlan != null)
-            {
-                _context.Entry(existingPlan).CurrentValues.SetValues(plan);
-                _context.SaveChanges();
-            }
-        }
-
-
-        public void Delete(Plan Plan)
-        {
-            if (Plan != null)
-            {
-                _context.Plan.Remove(Plan);
-                _context.SaveChanges();
-            }
-        }
+        void Delete(Plan Plan);
 
     }
 }
