@@ -197,7 +197,7 @@ namespace AIDentify.Controllers
                             claims: claims,
                             issuer: _configuration["JWT:Issuer"],
                             audience: _configuration["JWT:Audience"],
-                            expires: DateTime.Now.AddMinutes(10),
+                            expires: DateTime.Now.AddDays(7),
                             signingCredentials: sc
 
                             );
