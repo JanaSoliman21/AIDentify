@@ -316,9 +316,6 @@ namespace AIDentify.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("MaxPatients")
                         .HasColumnType("int");
 
@@ -331,9 +328,6 @@ namespace AIDentify.Migrations
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("PlanId");
 
@@ -462,6 +456,9 @@ namespace AIDentify.Migrations
                     b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
@@ -470,6 +467,9 @@ namespace AIDentify.Migrations
 
                     b.Property<string>("PlanId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("SubscriptionId");
 

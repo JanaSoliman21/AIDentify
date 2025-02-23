@@ -6,11 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AIDentify.Migrations
 {
     /// <inheritdoc />
-    public partial class Fixed : Migration
+    public partial class Final : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Admin",
+                columns: table => new
+                {
+                    Admin_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admin", x => x.Admin_ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -88,8 +104,6 @@ namespace AIDentify.Migrations
                     PlanId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MaxScans = table.Column<int>(type: "int", nullable: false),
                     MaxPatients = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false)
@@ -122,6 +136,25 @@ namespace AIDentify.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TrendingNews", x => x.NewsId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemUpdate",
+                columns: table => new
+                {
+                    SystemUpdateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UpdatedDescribtion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UpdateType = table.Column<int>(type: "int", nullable: false),
+                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemUpdate", x => x.SystemUpdateId);
+                    table.ForeignKey(
+                        name: "FK_SystemUpdate_Admin_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admin",
+                        principalColumn: "Admin_ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -236,6 +269,8 @@ namespace AIDentify.Migrations
                 {
                     SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PlanId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PayDateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -277,10 +312,10 @@ namespace AIDentify.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Doctor",
                 columns: table => new
                 {
-                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Doctor_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -288,54 +323,52 @@ namespace AIDentify.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     PaymentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
-                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    University = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Level = table.Column<int>(type: "int", nullable: true),
+                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctor", x => x.Doctor_ID);
+                    table.ForeignKey(
+                        name: "FK_Doctor_Payment_PaymentId",
+                        column: x => x.PaymentId,
+                        principalTable: "Payment",
+                        principalColumn: "PaymentId");
+                    table.ForeignKey(
+                        name: "FK_Doctor_Subscription_SubscriptionId",
+                        column: x => x.SubscriptionId,
+                        principalTable: "Subscription",
+                        principalColumn: "SubscriptionId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Student",
+                columns: table => new
+                {
+                    Student_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubscriptionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PaymentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    University = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: false),
                     TotalPOintsEarned = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.UserID);
+                    table.PrimaryKey("PK_Student", x => x.Student_ID);
                     table.ForeignKey(
-                        name: "FK_User_Payment_PaymentId",
+                        name: "FK_Student_Payment_PaymentId",
                         column: x => x.PaymentId,
                         principalTable: "Payment",
-                        principalColumn: "PaymentId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "PaymentId");
                     table.ForeignKey(
-                        name: "FK_User_Subscription_SubscriptionId",
+                        name: "FK_Student_Subscription_SubscriptionId",
                         column: x => x.SubscriptionId,
                         principalTable: "Subscription",
-                        principalColumn: "SubscriptionId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Message",
-                columns: table => new
-                {
-                    MessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Context = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Message", x => x.MessageId);
-                    table.ForeignKey(
-                        name: "FK_Message_User_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "User",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Message_User_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "User",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "SubscriptionId");
                 });
 
             migrationBuilder.CreateTable(
@@ -352,10 +385,49 @@ namespace AIDentify.Migrations
                 {
                     table.PrimaryKey("PK_Patient", x => x.PatientId);
                     table.ForeignKey(
-                        name: "FK_Patient_User_DoctorId",
+                        name: "FK_Patient_Doctor_DoctorId",
                         column: x => x.DoctorId,
-                        principalTable: "User",
-                        principalColumn: "UserID");
+                        principalTable: "Doctor",
+                        principalColumn: "Doctor_ID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Message",
+                columns: table => new
+                {
+                    MessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SenderIdD = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReceiverIdD = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SenderIdS = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ReceiverIdS = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Context = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Message", x => x.MessageId);
+                    table.ForeignKey(
+                        name: "FK_Message_Doctor_ReceiverIdS",
+                        column: x => x.ReceiverIdS,
+                        principalTable: "Doctor",
+                        principalColumn: "Doctor_ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Message_Doctor_SenderIdS",
+                        column: x => x.SenderIdS,
+                        principalTable: "Doctor",
+                        principalColumn: "Doctor_ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Message_Student_ReceiverIdS",
+                        column: x => x.ReceiverIdS,
+                        principalTable: "Student",
+                        principalColumn: "Student_ID");
+                    table.ForeignKey(
+                        name: "FK_Message_Student_SenderIdD",
+                        column: x => x.SenderIdD,
+                        principalTable: "Student",
+                        principalColumn: "Student_ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -378,30 +450,11 @@ namespace AIDentify.Migrations
                         principalColumn: "QuizId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_QuizAttempt_User_StudentId",
+                        name: "FK_QuizAttempt_Student_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
-                        principalColumn: "UserID",
+                        principalTable: "Student",
+                        principalColumn: "Student_ID",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SystemUpdate",
-                columns: table => new
-                {
-                    SystemUpdateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UpdatedDescribtion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    UpdateType = table.Column<int>(type: "int", nullable: false),
-                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SystemUpdate", x => x.SystemUpdateId);
-                    table.ForeignKey(
-                        name: "FK_SystemUpdate_User_AdminId",
-                        column: x => x.AdminId,
-                        principalTable: "User",
-                        principalColumn: "UserID");
                 });
 
             migrationBuilder.CreateTable(
@@ -444,22 +497,22 @@ namespace AIDentify.Migrations
                 {
                     table.PrimaryKey("PK_XRayScan", x => x.ScanId);
                     table.ForeignKey(
+                        name: "FK_XRayScan_Doctor_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctor",
+                        principalColumn: "Doctor_ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_XRayScan_Patient_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patient",
                         principalColumn: "PatientId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_XRayScan_User_DoctorId",
-                        column: x => x.DoctorId,
-                        principalTable: "User",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_XRayScan_User_StudentId",
+                        name: "FK_XRayScan_Student_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "User",
-                        principalColumn: "UserID",
+                        principalTable: "Student",
+                        principalColumn: "Student_ID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -503,19 +556,34 @@ namespace AIDentify.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Doctor_PaymentId",
+                table: "Doctor",
+                column: "PaymentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Doctor_SubscriptionId",
+                table: "Doctor",
+                column: "SubscriptionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicalHistory_PatientId",
                 table: "MedicalHistory",
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ReceiverId",
+                name: "IX_Message_ReceiverIdS",
                 table: "Message",
-                column: "ReceiverId");
+                column: "ReceiverIdS");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_SenderId",
+                name: "IX_Message_SenderIdD",
                 table: "Message",
-                column: "SenderId");
+                column: "SenderIdD");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Message_SenderIdS",
+                table: "Message",
+                column: "SenderIdS");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patient_DoctorId",
@@ -538,6 +606,16 @@ namespace AIDentify.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Student_PaymentId",
+                table: "Student",
+                column: "PaymentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Student_SubscriptionId",
+                table: "Student",
+                column: "SubscriptionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subscription_PayDateId",
                 table: "Subscription",
                 column: "PayDateId");
@@ -551,16 +629,6 @@ namespace AIDentify.Migrations
                 name: "IX_SystemUpdate_AdminId",
                 table: "SystemUpdate",
                 column: "AdminId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_PaymentId",
-                table: "User",
-                column: "PaymentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_SubscriptionId",
-                table: "User",
-                column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_XRayScan_DoctorId",
@@ -627,10 +695,16 @@ namespace AIDentify.Migrations
                 name: "Quiz");
 
             migrationBuilder.DropTable(
+                name: "Admin");
+
+            migrationBuilder.DropTable(
                 name: "Patient");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Student");
+
+            migrationBuilder.DropTable(
+                name: "Doctor");
 
             migrationBuilder.DropTable(
                 name: "Payment");

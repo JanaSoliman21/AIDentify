@@ -14,12 +14,6 @@ namespace AIDentify.Models
         public int Duration { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; } = DateTime.Now;
-
-        [Required]
-        public DateTime EndDate { get; set; } 
-
-        [Required]
         public int MaxScans { get; set; }
 
         [Required]

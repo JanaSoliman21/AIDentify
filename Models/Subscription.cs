@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Numerics;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AIDentify.Models
@@ -14,6 +15,11 @@ namespace AIDentify.Models
         [ValidateNever]
         [ForeignKey(nameof(PlanId))]
         public Plan? Plan { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime EndDate { get; set; }
 
         public string? PayDateId { get; set; }
 
