@@ -1,11 +1,13 @@
 ﻿using AIDentify.IRepositry;
 using AIDentify.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AIDentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(Roles ="Admin")]
     public class PlanController: ControllerBase
     {
         private readonly IPlanRepository PlanRepository;
