@@ -197,7 +197,7 @@ namespace AIDentify.Controllers
                             claims: claims,
                             issuer: _configuration["JWT:Issuer"],
                             audience: _configuration["JWT:Audience"],
-                            expires: DateTime.Now.AddDays(7),
+                            expires: DateTime.Now.AddDays(30),
                             signingCredentials: sc
 
                             );
@@ -266,6 +266,8 @@ namespace AIDentify.Controllers
             return Ok(new { message = "Password reset link generated", resetLink });
         }
 
+
+
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPassDto model)
         {
@@ -283,6 +285,8 @@ namespace AIDentify.Controllers
 
             return Ok(new { message = "Password reset successfully" });
         }
+
+
 
         [HttpDelete("Delete_Account")]
         [Authorize]
