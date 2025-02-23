@@ -7,7 +7,7 @@ namespace AIDentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="Admin")]
+    [Authorize(Roles ="Admin")]
     public class PlanController: ControllerBase
     {
         private readonly IPlanRepository PlanRepository;
