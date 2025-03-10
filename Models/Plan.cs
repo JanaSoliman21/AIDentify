@@ -5,13 +5,13 @@ namespace AIDentify.Models
     public class Plan
     {
         [Key]
-        public string PlanId { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [Required]
         public string PlanName { get; set; }
 
         [Required]
-        public int Duration { get; set; }
+        public int Duration { get; set; }   // in months
 
         [Required]
         public int MaxScans { get; set; }

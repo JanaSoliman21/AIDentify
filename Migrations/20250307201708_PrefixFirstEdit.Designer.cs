@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250307201708_PrefixFirstEdit")]
+    partial class PrefixFirstEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,7 +278,7 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Payment", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PaymentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<long>("Amount")
@@ -287,16 +290,13 @@ namespace AIDentify.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<string>("StudentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("WayOfPayment")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentId");
 
                     b.HasIndex("DoctorId");
 
@@ -307,7 +307,7 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Plan", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PlanId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Duration")
@@ -326,7 +326,7 @@ namespace AIDentify.Migrations
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("PlanId");
 
                     b.ToTable("Plan");
                 });
@@ -445,7 +445,7 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Subscription", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DoctorId")
@@ -463,16 +463,13 @@ namespace AIDentify.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.Property<string>("StudentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("WarningDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("SubscriptionId");
 
                     b.HasIndex("DoctorId")
                         .IsUnique()

@@ -7,7 +7,6 @@ namespace AIDentify.Repositry
     public class PlanRepositry : IPlanRepository
     {
         private readonly ContextAIDentify _context;
-
         public PlanRepositry(ContextAIDentify context)
         {
             _context = context;
@@ -31,7 +30,7 @@ namespace AIDentify.Repositry
 
         public void Update(Plan plan)
         {
-            var existingPlan = _context.Plan.Find(plan.PlanId);
+            var existingPlan = _context.Plan.Find(plan.Id);
 
             if (existingPlan != null)
             {
@@ -40,7 +39,6 @@ namespace AIDentify.Repositry
             }
         }
 
-
         public void Delete(Plan Plan)
         {
             if (Plan != null)
@@ -48,6 +46,21 @@ namespace AIDentify.Repositry
                 _context.Plan.Remove(Plan);
                 _context.SaveChanges();
             }
+        }
+
+        public bool Deleteable(string id)
+        {
+            bool hasSubscriptions = _context.Subscription.Any(s => s.PlanId == id);
+            if (hasSubscriptions)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool PlanExists(string id)
+        {
+            return _context.Plan.Any(e => e.Id == id);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+//using System.Text.Json.Serialization;
 
 namespace AIDentify.Models
 {
@@ -30,19 +32,15 @@ namespace AIDentify.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-
         public string? SubscriptionId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SubscriptionId))]
+        [JsonIgnore]
         public Subscription? Subscription { get; set; }
 
-        public string? PaymentId { get; set; }
-
         [ValidateNever]
-        [ForeignKey(nameof(PaymentId))]
-        public Payment? Payment { get; set; }
-
+        public List<Payment>? Payments { get; set; } = new();
         [Required]
         public string University { get; set; }
 

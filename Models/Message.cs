@@ -13,25 +13,25 @@ namespace AIDentify.Models
 
         [ValidateNever]
         [ForeignKey(nameof(SenderIdD))]
-        public Doctor? Sender { get; set; }
+        public Doctor? SenderDoctor { get; set; }
 
         public string? ReceiverIdD { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(ReceiverIdD))]
-        public Doctor? Receiver { get; set; }
+        public Doctor? ReceiverDoctor { get; set; }
 
         public string? SenderIdS { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SenderIdD))]
-        public Student? SenderS { get; set; }
+        public Student? SenderStudent { get; set; }
 
         public string? ReceiverIdS { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(ReceiverIdS))]
-        public Student? ReceiverS { get; set; }
+        public Student? ReceiverStudent { get; set; }
 
         [Required]
         public string Context { get; set; }

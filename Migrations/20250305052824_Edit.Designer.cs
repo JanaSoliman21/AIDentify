@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250305052824_Edit")]
+    partial class Edit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,6 +170,9 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
@@ -176,6 +182,8 @@ namespace AIDentify.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Doctor_ID");
+
+                    b.HasIndex("PaymentId");
 
                     b.HasIndex("SubscriptionId");
 
@@ -221,7 +229,7 @@ namespace AIDentify.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiverIdD")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReceiverIdS")
                         .HasColumnType("nvarchar(450)");
@@ -236,8 +244,6 @@ namespace AIDentify.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("MessageId");
-
-                    b.HasIndex("ReceiverIdD");
 
                     b.HasIndex("ReceiverIdS");
 
@@ -275,39 +281,23 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Payment", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PaymentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<long>("Amount")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StudentId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("WayOfPayment")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("DoctorId");
-
-                    b.HasIndex("StudentId");
+                    b.HasKey("PaymentId");
 
                     b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Plan", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PlanId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Duration")
@@ -326,7 +316,7 @@ namespace AIDentify.Migrations
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("PlanId");
 
                     b.ToTable("Plan");
                 });
@@ -421,6 +411,9 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
@@ -438,6 +431,8 @@ namespace AIDentify.Migrations
 
                     b.HasKey("Student_ID");
 
+                    b.HasIndex("PaymentId");
+
                     b.HasIndex("SubscriptionId");
 
                     b.ToTable("Student");
@@ -445,10 +440,7 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Subscription", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DoctorId")
+                    b.Property<string>("SubscriptionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EndDate")
@@ -463,26 +455,9 @@ namespace AIDentify.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StudentId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("WarningDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DoctorId")
-                        .IsUnique()
-                        .HasFilter("[DoctorId] IS NOT NULL");
+                    b.HasKey("SubscriptionId");
 
                     b.HasIndex("PlanId");
-
-                    b.HasIndex("StudentId")
-                        .IsUnique()
-                        .HasFilter("[StudentId] IS NOT NULL");
 
                     b.ToTable("Subscription");
                 });
@@ -711,9 +686,15 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
+                    b.HasOne("AIDentify.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId");
+
                     b.HasOne("AIDentify.Models.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId");
+
+                    b.Navigation("Payment");
 
                     b.Navigation("Subscription");
                 });
@@ -729,33 +710,31 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Message", b =>
                 {
-                    b.HasOne("AIDentify.Models.Doctor", "ReceiverDoctor")
-                        .WithMany()
-                        .HasForeignKey("ReceiverIdD")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AIDentify.Models.Student", "ReceiverStudent")
+                    b.HasOne("AIDentify.Models.Doctor", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverIdS")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AIDentify.Models.Doctor", "SenderDoctor")
+                    b.HasOne("AIDentify.Models.Student", "ReceiverS")
                         .WithMany()
-                        .HasForeignKey("SenderIdD")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ReceiverIdS");
 
-                    b.HasOne("AIDentify.Models.Student", "SenderStudent")
+                    b.HasOne("AIDentify.Models.Student", "SenderS")
+                        .WithMany()
+                        .HasForeignKey("SenderIdD");
+
+                    b.HasOne("AIDentify.Models.Doctor", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderIdS")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("ReceiverDoctor");
+                    b.Navigation("Receiver");
 
-                    b.Navigation("ReceiverStudent");
+                    b.Navigation("ReceiverS");
 
-                    b.Navigation("SenderDoctor");
+                    b.Navigation("Sender");
 
-                    b.Navigation("SenderStudent");
+                    b.Navigation("SenderS");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
@@ -765,23 +744,6 @@ namespace AIDentify.Migrations
                         .HasForeignKey("DoctorId");
 
                     b.Navigation("Doctor");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Payment", b =>
-                {
-                    b.HasOne("AIDentify.Models.Doctor", "Doctor")
-                        .WithMany("Payments")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AIDentify.Models.Student", "Student")
-                        .WithMany("Payments")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Question", b =>
@@ -810,34 +772,27 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Student", b =>
                 {
+                    b.HasOne("AIDentify.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId");
+
                     b.HasOne("AIDentify.Models.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId");
+
+                    b.Navigation("Payment");
 
                     b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Subscription", b =>
                 {
-                    b.HasOne("AIDentify.Models.Doctor", "Doctor")
-                        .WithOne()
-                        .HasForeignKey("AIDentify.Models.Subscription", "DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("AIDentify.Models.Plan", "Plan")
                         .WithMany()
-                        .HasForeignKey("PlanId");
-
-                    b.HasOne("AIDentify.Models.Student", "Student")
-                        .WithOne()
-                        .HasForeignKey("AIDentify.Models.Subscription", "StudentId")
+                        .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Doctor");
-
                     b.Navigation("Plan");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("AIDentify.Models.SystemUpdate", b =>
@@ -931,8 +886,6 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
-                    b.Navigation("Payments");
-
                     b.Navigation("patients");
                 });
 
@@ -944,11 +897,6 @@ namespace AIDentify.Migrations
             modelBuilder.Entity("AIDentify.Models.Quiz", b =>
                 {
                     b.Navigation("Questions");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Student", b =>
-                {
-                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

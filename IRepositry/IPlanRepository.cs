@@ -9,8 +9,10 @@ namespace AIDentify.IRepositry
         Plan? Get(string id);
         void Add(Plan Plan);
         void Update(Plan plan);
-
         void Delete(Plan Plan);
+
+        bool Deleteable(string id);
+        bool PlanExists(string id);
 
     }
 }

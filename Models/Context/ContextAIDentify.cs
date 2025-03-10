@@ -16,78 +16,92 @@ namespace AIDentify.Models.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Message Relationships - Handle Sender & Receiver
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.Sender)
+                .HasOne(m => m.SenderDoctor)
                 .WithMany()
                 .HasForeignKey(m => m.SenderIdD)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.Receiver)
-                .WithMany()
-                .HasForeignKey(m => m.ReceiverIdD)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Sender)
+                .HasOne(m => m.SenderStudent)
                 .WithMany()
                 .HasForeignKey(m => m.SenderIdS)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.Receiver)
+                .HasOne(m => m.ReceiverDoctor)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverIdD)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.ReceiverStudent)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverIdS)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
-
+            // XRayScan Relationships - Enforce Rules
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Patient)
                 .WithMany()
                 .HasForeignKey(x => x.PatientId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Doctor)
                 .WithMany()
                 .HasForeignKey(x => x.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Student)
                 .WithMany()
                 .HasForeignKey(x => x.StudentId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
+            // QuizAttempt Relationships
             modelBuilder.Entity<QuizAttempt>()
                 .HasOne(x => x.Student)
                 .WithMany()
                 .HasForeignKey(x => x.StudentId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<QuizAttempt>()
                 .HasOne(x => x.Quiz)
                 .WithMany()
                 .HasForeignKey(x => x.QuizId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Subscription Relationship Fix
+            modelBuilder.Entity<Subscription>()
+                .HasOne(s => s.Doctor)
+                .WithOne()
+                .HasForeignKey<Subscription>(s => s.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Subscription>()
-                .HasOne(x => x.PayDate)
-                .WithMany()
-                .HasForeignKey(x => x.PayDateId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+                .HasOne(s => s.Student)
+                .WithOne()
+                .HasForeignKey<Subscription>(s => s.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Subscription>()
-                .HasOne(x => x.Plan)
-                .WithMany()
-                .HasForeignKey(x => x.PlanId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+            // Payment Relationship Fix
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Doctor)
+                .WithMany(d => d.Payments)
+                .HasForeignKey(p => p.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-           
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Student)
+                .WithMany(s => s.Payments)
+                .HasForeignKey(p => p.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
+
 
         public override int SaveChanges()
         {
@@ -108,6 +122,26 @@ namespace AIDentify.Models.Context
                     }
                 }
 
+                foreach (var entry in ChangeTracker.Entries<Subscription>())
+                {
+                    var sub = entry.Entity;
+
+                    if (!string.IsNullOrEmpty(sub.DoctorId) && !string.IsNullOrEmpty(sub.StudentId))
+                    {
+                        throw new Exception("A Subscription must belong to either a Doctor or a Student, not both.");
+                    }
+                }
+
+                foreach (var entry in ChangeTracker.Entries<Payment>())
+                {
+                    var payment = entry.Entity;
+
+                    if (!string.IsNullOrEmpty(payment.DoctorId) && !string.IsNullOrEmpty(payment.StudentId))
+                    {
+                        throw new Exception("A Payment must belong to either a Doctor or a Student, not both.");
+                    }
+                }
+
                 return base.SaveChanges();
             }
             catch (Exception ex)
@@ -118,12 +152,12 @@ namespace AIDentify.Models.Context
         }
 
 
+
         public DbSet<Admin> Admin { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<MedicalHistory> MedicalHistory { get; set; }
         public DbSet<Message> Message { get; set; }
         public DbSet<Patient> Patient { get; set; }
-        public DbSet<PayDate> payDate { get; set; }
         public DbSet<Payment> Payment { get; set; }
         public DbSet<Plan> Plan { get; set; }
         public DbSet<Question> Question { get; set; }
