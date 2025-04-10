@@ -22,7 +22,8 @@ namespace AIDentify.Controllers
             _idGenerator = idGenerator;
         }
 
-        // Get All Payments for this User
+        #region Get All Payments for this User
+
         [HttpGet("{userId}")]
         public ActionResult<List<Payment>> GetAll(string userId)
         {
@@ -34,7 +35,10 @@ namespace AIDentify.Controllers
             return Ok(payments);
         }
 
-        // Get a Specific Payment by ID for this User
+        #endregion
+
+        #region Get a Specific Payment by ID for this User
+
         [HttpGet("{userId}/{id}")]
         public ActionResult<Payment> Get(string userId, string id)
         {
@@ -46,7 +50,10 @@ namespace AIDentify.Controllers
             return Ok(payment);
         }
 
-        //// Add a New Payment for this User
+        #endregion
+
+        #region Add a New Payment for this User (Commented)
+
         //[HttpPost("{userId}")]
         //public ActionResult Add(string userId, [FromBody] Payment payment)
         //{
@@ -102,8 +109,10 @@ namespace AIDentify.Controllers
         //    }
         //}
 
+        #endregion
 
-        // Update an Existing Payment for this User
+        #region Update an Existing Payment for this User
+
         [HttpPut("{userId}/{id}")]
         public ActionResult Update(string userId, string id, [FromBody] Payment payment)
         {
@@ -146,8 +155,10 @@ namespace AIDentify.Controllers
             }
         }
 
+        #endregion
 
-        // Delete a Payment for this User
+        #region Delete a Payment for this User
+
         [HttpDelete("{userId}/{paymentId}")]
         public ActionResult Delete(string userId, string paymentId)
         {
@@ -194,7 +205,10 @@ namespace AIDentify.Controllers
             }
         }
 
-        // Admin fetches all pending payments
+        #endregion
+
+        #region Admin fetches all pending payments
+
         [HttpGet("pending")]
         public IActionResult GetPendingPayments()
         {
@@ -202,7 +216,10 @@ namespace AIDentify.Controllers
             return Ok(pendingPayments);
         }
 
-        // Admin approves or rejects a payment
+        #endregion
+
+        #region Admin approves or rejects a payment
+        
         [HttpPut("update-status/{paymentId}")]
         public IActionResult UpdatePaymentStatus(string paymentId, [FromBody] string status)
         {
@@ -219,8 +236,30 @@ namespace AIDentify.Controllers
 
             return BadRequest("Please write 'Pending', 'Completed', or 'Failed'.");
         }
+        
+        #endregion
 
     }
+
+    #region DTOs (Data Transfer Objects) (Commented)
+
+    //// DTO for creating a new payment
+    //public class PaymentRequest
+    //{
+    //    public string Amount { get; set; }
+    //    public DateTime PaymentDate { get; set; }
+    //    public string WayOfPayment { get; set; }
+    //    public string SubscriptionId { get; set; }
+    //}
+    //// DTO for updating an existing payment
+    //public class PaymentUpdateRequest
+    //{
+    //    public string Amount { get; set; }
+    //    public DateTime PaymentDate { get; set; }
+    //    public string WayOfPayment { get; set; }
+    //}
+    #endregion
+}
 
     //// DTO for updating payment status
     //public class PaymentStatusUpdateRequest
@@ -228,4 +267,4 @@ namespace AIDentify.Controllers
     //    public PaymentStatus Status { get; set; }
     //    public string AdminId { get; set; } // Admin who reviews the payment
     //}
-}
+

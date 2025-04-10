@@ -36,6 +36,7 @@ namespace AIDentify.Service
                         foreach (var subscription in expiredSubscriptions)
                         {
                             subscription.Status = SubscriptionStatus.Expired;
+                            //subscription.IsPaid = false; // Assuming you want to set IsPaid to false when expired
                         }
 
                         await dbContext.SaveChangesAsync();

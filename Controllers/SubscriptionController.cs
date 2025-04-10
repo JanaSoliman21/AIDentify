@@ -99,7 +99,8 @@ namespace AIDentify.Controllers
 
         #region Subscription-Payment Management
 
-        // Create a Payment for the first time for a Subscription that doesn't exist
+        #region Create a Payment for the first time for a Subscription that doesn't exist
+        
         [HttpPost("new/user={userId}")]
         public IActionResult AddPaymentToANewSubscription(string userId, [FromBody] SubscriptionPaymentDto subscriptionPayment)
         {
@@ -161,7 +162,10 @@ namespace AIDentify.Controllers
             return Ok("Posted Successfully");
         }
 
-        // Create a Payment for a Subscription that already exists
+        #endregion
+
+        #region Create a Payment for a Subscription that already exists
+        
         [HttpPost("existing/user={userId}")]
         public IActionResult AddPaymentToExistingSubscription(string userId, [FromBody] Payment payment)
         {
@@ -218,6 +222,8 @@ namespace AIDentify.Controllers
 
             return Ok("Posted Successfully");
         }
+
+        #endregion
 
         #endregion
     }
