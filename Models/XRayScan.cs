@@ -32,16 +32,17 @@ namespace AIDentify.Models
         public string ImagePath { get; set; }
 
         [ValidateNever]
-        public byte[] DiseasePrediction { get; set; }
+        public byte[]? DiseasePrediction { get; set; }
+
+       
+        [ValidateNever]
+        public String? TeethPrediction { get; set; }
 
         [ValidateNever]
-        public int TeethCount { get; set; }
+        public Age? PredictedAgeGroup { get; set; }
 
         [ValidateNever]
-        public Age PredictedAgeGroup { get; set; }
-
-        [ValidateNever]
-        public Gender PredictedGenderGroup { get; set; }
+        public Gender? PredictedGenderGroup { get; set; }
 
         [Required]
         public DateTime ScanDate { get; set; }
