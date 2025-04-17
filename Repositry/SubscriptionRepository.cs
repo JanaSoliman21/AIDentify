@@ -14,16 +14,25 @@ namespace AIDentify.Repositry
             _context = context;
         }
 
+        #region Get All Subscriptions
+
         public List<Subscription> GetAllSubscriptions()
         {
             return _context.Subscription.Include(x => x.Plan).ToList();
         }
+
+        #endregion
+
+        #region Get All Subscriptions by User Id
 
         public Subscription? GetSubscription(string id)
         {
             return _context.Subscription.Include(s => s.Plan).FirstOrDefault(s => s.Id == id);
         }
 
+        #endregion
+
+        #region Add Subscription to a Specific User
         public void AddSubscription(Subscription subscription, string userId)
         {
             subscription.Plan = _context.Plan.Find(subscription.PlanId);
@@ -61,7 +70,9 @@ namespace AIDentify.Repositry
             _context.SaveChanges();
         }
 
+        #endregion
 
+        #region Update Subscription
         public void UpdateSubscription(Subscription subscription)
         {
             var existingSubscription = _context.Subscription.Find(subscription.Id);
@@ -71,6 +82,10 @@ namespace AIDentify.Repositry
                 _context.SaveChanges();
             }
         }
+
+        #endregion
+
+        #region Delete Subscription
 
         public void DeleteSubscription(Subscription subscription)
         {
@@ -98,6 +113,10 @@ namespace AIDentify.Repositry
             }
         }
 
+        #endregion
+
+        #region Check if the User has an existing Subscription
+
         public Subscription? GetSubscriptionByUserId(string userId)
         {
             return _context.Subscription
@@ -107,6 +126,7 @@ namespace AIDentify.Repositry
                 .FirstOrDefault(s => s.DoctorId == userId || s.StudentId == userId);
         }
 
+        #endregion
 
     }
 }

@@ -16,6 +16,8 @@ namespace AIDentify.Repositry
             _context = context;
         }
 
+        #region GetAll by User Id
+
         public List<Payment>? GetAll(string userId)
         {
             var doctor = _context.Doctor.FirstOrDefault(d => d.Doctor_ID == userId);
@@ -33,6 +35,9 @@ namespace AIDentify.Repositry
             return null;
         }
 
+        #endregion
+
+        #region Get One Payment by User Id and Payment Id
         public Payment? Get(string userId, string id)
         {
             var doctor = _context.Doctor.FirstOrDefault(d => d.Doctor_ID == userId);
@@ -52,7 +57,9 @@ namespace AIDentify.Repositry
             return null;
         }
 
+        #endregion
 
+        #region Add Payment to a Specific User
         public void Add(string userId, Payment payment)
         {
             // Assign the current date to the payment
@@ -84,6 +91,9 @@ namespace AIDentify.Repositry
             throw new Exception("User not found.");
         }
 
+        #endregion
+
+        #region Update an existing Payment for a specific user
 
         public void Update(string userId, Payment payment)
         {
@@ -123,6 +133,9 @@ namespace AIDentify.Repositry
             _context.SaveChanges();
         }
 
+        #endregion
+
+        #region Delete an existing Payment for a specific user
 
         public void Delete(string userId, Payment payment)
         {
@@ -157,13 +170,18 @@ namespace AIDentify.Repositry
             _context.SaveChanges();
         }
 
-        // Get all pending payments (for admin review)
+        #endregion
+
+        #region Get all pending payments (for admin review)
+        
         public IEnumerable<Payment> GetPendingPayments()
         {
             return _context.Payment.Where(p => p.Status == PaymentStatues.Pending).ToList();
         }
 
-        // Admin approves or rejects a payment
+        #endregion
+
+        #region Admin approves or rejects a payment
         public void UpdateStatus(string paymentId, PaymentStatues status)
         {
             var payment = _context.Payment.FirstOrDefault(p => p.Id == paymentId);
@@ -173,5 +191,7 @@ namespace AIDentify.Repositry
                 _context.SaveChanges();
             }
         }
+
+        #endregion
     }
 }
