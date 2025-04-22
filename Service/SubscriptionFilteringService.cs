@@ -3,17 +3,20 @@ using AIDentify.Models.Enums;
 
 namespace AIDentify.Service
 {
+    using AIDentify.IRepositry;
+    using AIDentify.Models;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class SubscriptionExpirationService : BackgroundService
+    public class SubscriptionFilteringService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public SubscriptionExpirationService(IServiceScopeFactory scopeFactory)
+        public SubscriptionFilteringService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
         }
@@ -29,30 +32,25 @@ namespace AIDentify.Service
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
 
                         // Get subscriptions that need to be updated
-                        var expiredSubscriptions = dbContext.Subscription
-                            .Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
+                        IEnumerable<Subscription> UnNeededSubscriptions = dbContext.Subscription
+                            .Where(s => s.DoctorId == null && s.StudentId == null)
                             .ToList();
 
-                        if (expiredSubscriptions.Any())
+                        if (UnNeededSubscriptions.Any())
                         {
-                            foreach (var subscription in expiredSubscriptions)
-                            {
-                                subscription.Status = SubscriptionStatus.Expired;
-                                //subscription.IsPaid = false; // Assuming you want to set IsPaid to false when expired
-                            }
-
+                            dbContext.Subscription.RemoveRange(UnNeededSubscriptions);
                             await dbContext.SaveChangesAsync();
                         }
                     }
 
                     // Wait for a set interval before running again
-                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Runs every hour
+                    await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
                 }
-            } catch (TaskCanceledException) 
-            {
-                throw new Exception("SubscriptionExpiration Task was canceled.");
             }
-            
+            catch(TaskCanceledException) 
+            {
+                throw new Exception("SubscriptionFiltering Task was canceled.");
+            }
         }
     }
 }

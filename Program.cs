@@ -43,6 +43,8 @@ namespace AIDentify
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IdGenerator>();
             builder.Services.AddHostedService<SubscriptionExpirationService>();
+            //builder.Services.AddHostedService<SubscriptionFilteringService>();    // Not Finished Yet
+            builder.Services.AddHostedService<PlanUpdatingService>();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
@@ -56,6 +58,11 @@ namespace AIDentify
 
 
             builder.Services.AddCustomJwtAuth(builder.Configuration);
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+
 
             var app = builder.Build();
             app.UseMiddleware<TokenBlacklistMiddleware>();

@@ -259,6 +259,7 @@ namespace AIDentify.Controllers
     //    public string WayOfPayment { get; set; }
     //}
     #endregion
+
 }
 
     //// DTO for updating payment status

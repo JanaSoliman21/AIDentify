@@ -108,6 +108,20 @@ namespace AIDentify.Repositry
                         student.SubscriptionId = null;
                     }
                 }
+
+                _context.Subscription.Remove(subscription);
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
+
+        #region Delete (For Service)
+
+        public void Delete(Subscription subscription)
+        {
+            if (subscription != null)
+            {
                 _context.Subscription.Remove(subscription);
                 _context.SaveChanges();
             }

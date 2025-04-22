@@ -27,17 +27,27 @@ namespace AIDentify.Controllers
 
         #region Normal CRUD Operations
 
+        #region Get All
+
         [HttpGet]
         public IActionResult GetAll()
         {
             return Ok(SubscriptionRepository.GetAllSubscriptions());
         }
 
+        #endregion
+
+        #region Get By Id
+
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
             return Ok(SubscriptionRepository.GetSubscription(id));
         }
+
+        #endregion
+
+        #region Get by User
 
         [HttpGet("user={userId}")]
         public IActionResult GetByUser(string userId)
@@ -51,25 +61,38 @@ namespace AIDentify.Controllers
             return Ok(subscription);
         }
 
-        [HttpPost("user={userId}")]
-        public IActionResult Add([FromBody] Subscription subscription, string userId)
-        {
-            subscription.Id = _idGenerator.GenerateId<Subscription>(ModelPrefix.Subscription);
-            if (subscription.PlanId == null || !PlanRepository.PlanExists(subscription.PlanId))
-            {
-                return BadRequest("Plan not found.");
-            }
-            SubscriptionRepository.AddSubscription(subscription, userId);
-            return Ok("Posted Successfully");
-        }
+        #endregion
+
+        #region Add New Subscription (Commented)
+
+        //[HttpPost("user={userId}")]
+        //public IActionResult Add([FromBody] Subscription subscription, string userId)
+        //{
+        //    subscription.Id = _idGenerator.GenerateId<Subscription>(ModelPrefix.Subscription);
+        //    if (subscription.PlanId == null || !PlanRepository.PlanExists(subscription.PlanId))
+        //    {
+        //        return BadRequest("Plan not found.");
+        //    }
+        //    SubscriptionRepository.AddSubscription(subscription, userId);
+        //    return Ok("Posted Successfully");
+        //}
+
+        #endregion
+
+        #region Update Subscription
 
         [HttpPut("{id}")]
         public IActionResult Update(string id, [FromBody] Subscription subscription)
         {
-            if (id != subscription.Id)
-            {
-                return BadRequest("ID in the URL does not match ID in the body.");
-            }
+            //if (subscription.Id == null)
+            //{
+            //    subscription.Id = id;
+            //}
+            //else if (id != subscription.Id)
+            //{
+            //    return BadRequest("ID in the URL does not match ID in the body.");
+            //}
+            subscription.Id = id;
             var existingSubscription = SubscriptionRepository.GetSubscription(subscription.Id);
             if (existingSubscription == null)
             {
@@ -83,6 +106,10 @@ namespace AIDentify.Controllers
             return Ok("Updated Successfully");
         }
 
+        #endregion
+
+        #region Delete a Subscription
+
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
@@ -95,12 +122,15 @@ namespace AIDentify.Controllers
             SubscriptionRepository.DeleteSubscription(existingSubscription);
             return Ok("Deleted Successfully");
         }
+
+        #endregion
+
         #endregion
 
         #region Subscription-Payment Management
 
         #region Create a Payment for the first time for a Subscription that doesn't exist
-        
+
         [HttpPost("new/user={userId}")]
         public IActionResult AddPaymentToANewSubscription(string userId, [FromBody] SubscriptionPaymentDto subscriptionPayment)
         {
@@ -226,5 +256,25 @@ namespace AIDentify.Controllers
         #endregion
 
         #endregion
+
+        #region Access Subscription by UserId
+
+        [HttpGet("access/{userId}")]
+        public IActionResult AccessSubscription(string userId)
+        {
+            var subscription = SubscriptionRepository.GetSubscriptionByUserId(userId);
+            if (subscription == null)
+            {
+                return NotFound("Sorry! You have no Subscription.");
+            }
+            if (subscription.Status == SubscriptionStatus.Active)
+            {
+                return Ok("Welcome to your Subscription");
+            }
+            return NotFound("Sorry! Your Subscription has ended, you need to renew your Subscription.");
+        }
+
+        #endregion
+
     }
 }

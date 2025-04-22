@@ -20,17 +20,27 @@ namespace AIDentify.Controllers
             _idGenerator = idGenerator;
         }
 
+        #region Get All
+
         [HttpGet]
         public IActionResult GetAll()
         {
             return Ok(PlanRepository.GetAll());
         }
 
+        #endregion
+
+        #region Get By Id
+
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
             return Ok(PlanRepository.Get(id));
         }
+
+        #endregion
+
+        #region Add New Plan
 
         [HttpPost]
         public IActionResult Add([FromBody] Plan plan)
@@ -40,13 +50,18 @@ namespace AIDentify.Controllers
             return Ok("Posted Successfully");
         }
 
+        #endregion
+
+        #region Update Plan
+
         [HttpPut("{id}")]
         public IActionResult Update(string id, [FromBody] Plan plan)
         {
-            if (id != plan.Id)
-            {
-                return BadRequest("ID in the URL does not match ID in the body.");
-            }
+            //if (id != plan.Id)
+            //{
+            //    return BadRequest("ID in the URL does not match ID in the body.");
+            //}
+            plan.Id = id;
 
             var existingPlan = PlanRepository.Get(plan.Id);
             if (existingPlan == null)
@@ -59,6 +74,9 @@ namespace AIDentify.Controllers
             return Ok("Updated Successfully");
         }
 
+        #endregion
+
+        #region Delete Plan
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
@@ -81,5 +99,8 @@ namespace AIDentify.Controllers
                 return NotFound("Plan not found");
             }
         }
+
+        #endregion
+
     }
 }

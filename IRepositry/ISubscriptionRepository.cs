@@ -9,6 +9,7 @@ namespace AIDentify.IRepositry
         void AddSubscription(Subscription subscription, string userId);
         void UpdateSubscription(Subscription subscription);
         void DeleteSubscription(Subscription subscription);
+        void Delete(Subscription subscription);
         Subscription? GetSubscriptionByUserId(string userId);
 
     }
