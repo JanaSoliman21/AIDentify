@@ -28,7 +28,7 @@ namespace AIDentify.Controllers
         [HttpPost("predict_Age")]
         public async Task<IActionResult> PredictAge([FromForm] ModelsDto request)
         {
-            var pythonApiUrl = "http://127.0.0.1:8000/predict-age";
+            var pythonApiUrl = "https://amrgamall2003-gp-api.hf.space/api/age/detect";
 
             if (request.File == null || request.File.Length == 0)
             {
@@ -64,11 +64,11 @@ namespace AIDentify.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             var predictionResult = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
-            if (predictionResult == null || !predictionResult.ContainsKey("prediction"))
+            if (predictionResult == null || !predictionResult.ContainsKey("age_group"))
                 {
                     return BadRequest("Invalid response from AI model.");
                 }
-                if (Enum.TryParse(predictionResult["prediction"], out Age predictedAge))
+                if (Enum.TryParse(predictionResult["age_group"], out Age predictedAge))
                 {
                     xRayScan.PredictedAgeGroup = predictedAge;
                     context.XRayScan.Update(xRayScan);
@@ -90,7 +90,7 @@ namespace AIDentify.Controllers
         [HttpPost("predict_Gender")]
         public async Task<IActionResult> PredictGender([FromForm] ModelsDto request)
         {
-            var pythonApiUrl = "http://127.0.0.1:8000/predict-Gender";
+            var pythonApiUrl = "https://amrgamall2003-gp-api.hf.space/api/gender/detect";
 
             if (request.File == null || request.File.Length == 0)
             {
@@ -126,11 +126,11 @@ namespace AIDentify.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             var predictionResult = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
-            if (predictionResult == null || !predictionResult.ContainsKey("prediction"))
+            if (predictionResult == null || !predictionResult.ContainsKey("gender"))
             {
                 return BadRequest("Invalid response from AI model.");
             }
-            if (Enum.TryParse(predictionResult["prediction"], out Gender predictedGender))
+            if (Enum.TryParse(predictionResult["gender"], out Gender predictedGender))
             {
                 xRayScan.PredictedGenderGroup = predictedGender;
                 context.XRayScan.Update(xRayScan);
@@ -215,13 +215,13 @@ namespace AIDentify.Controllers
                 return BadRequest("No file uploaded.");
             }
 
-            var existingScan = await context.XRayScan
-                .FirstOrDefaultAsync(x => x.ImagePath == request.File.FileName);
+            //var existingScan = await context.XRayScan
+            //    .FirstOrDefaultAsync(x => x.ImagePath == request.File.FileName);
 
-            if (existingScan != null)
-            {
-                return BadRequest("This image has already been processed.");
-            }
+            //if (existingScan != null)
+            //{
+            //    return BadRequest("This image has already been processed.");
+            //}
 
             using var memoryStream = new MemoryStream();
             await request.File.CopyToAsync(memoryStream);
