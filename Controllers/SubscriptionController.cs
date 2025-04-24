@@ -183,6 +183,12 @@ namespace AIDentify.Controllers
             // set the subscription status
             subscription.Status = SubscriptionStatus.Active;
 
+            // payment check
+            if (payment.Amount != plan.Price)
+            {
+                return BadRequest("Payment amount does not match the plan price.");
+            }
+
             //// save all changes
             // save the subscription
             SubscriptionRepository.AddSubscription(subscription, userId);
@@ -243,6 +249,11 @@ namespace AIDentify.Controllers
             // set the subscription warning date to the end date - 7 days
             subscription.WarningDate = subscription.EndDate.AddDays(-7);
 
+            // Payment Check
+            if (payment.Amount != plan.Price)
+            {
+                return BadRequest("Payment amount does not match the plan price.");
+            }
 
             //// save all changes
             // save the payment

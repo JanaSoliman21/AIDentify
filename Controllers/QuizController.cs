@@ -1,0 +1,189 @@
+﻿using AIDentify.ID_Generator;
+using AIDentify.IRepositry;
+using AIDentify.Models;
+using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AIDentify.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class QuizController : ControllerBase
+    {
+        private readonly IQuizRepository _quizRepository;
+        private readonly IQuestionRepository _questionRepository;
+        private readonly IdGenerator _idGenerator;
+
+        public QuizController(IQuizRepository quizRepository, IdGenerator idGenerator, IQuestionRepository questionRepository)
+        {
+            _quizRepository = quizRepository;
+            _idGenerator = idGenerator;
+            _questionRepository = questionRepository;
+        }
+
+        #region Normal CRUD Methods
+
+        #region Get All Quizzes
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var quizzes = _quizRepository.GetAll();
+            if (quizzes == null || !quizzes.Any())
+            {
+                return NotFound("No quizzes found.");
+            }
+            return Ok(quizzes);
+        }
+
+        #endregion
+
+        #region Get Quiz by ID
+
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
+        {
+            var quiz = _quizRepository.GetById(id);
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+            return Ok(quiz);
+        }
+
+        #endregion
+
+        #region Add New Quiz
+
+        [HttpPost]
+        public IActionResult Add([FromBody] Quiz quiz)
+        {
+            if (quiz == null)
+            {
+                return BadRequest("Quiz cannot be null.");
+            }
+
+            quiz.Id = _idGenerator.GenerateId<Quiz>(ModelPrefix.Quiz);
+
+            _quizRepository.Add(quiz);
+            return Ok("Posted Successfully");
+        }
+
+        #endregion
+
+        #region Update Quiz
+
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, [FromBody] Quiz quiz)
+        {
+            if (quiz == null)
+            {
+                return BadRequest("Quiz cannot be null.");
+            }
+            var existingQuiz = _quizRepository.GetById(id);
+            if (existingQuiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+            quiz.Id = id;
+            _quizRepository.Update(quiz);
+            return Ok("Updated Successfully");
+        }
+
+        #endregion
+
+        #region Delete Quiz
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            var quiz = _quizRepository.GetById(id);
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+            _quizRepository.Delete(quiz);
+            return Ok("Deleted Successfully");
+        }
+
+        #endregion
+
+        #region Delete All Quizzes
+        [HttpDelete]
+        public IActionResult DeleteAll()
+        {
+            _quizRepository.DeleteAll();
+            return Ok("All quizzes deleted successfully.");
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Quizzes with Questions Methods
+
+        #region Create Questions for a new Quiz
+
+        [HttpPost("new/questions")]
+        public IActionResult AddQuestionsToNewQuiz([FromBody] Quiz quiz)
+        {
+            if (quiz == null)
+            {
+                return BadRequest("Quiz cannot be null.");
+            }
+
+            quiz.Id = _idGenerator.GenerateId<Quiz>(ModelPrefix.Quiz);
+
+            List<Question> questions = new List<Question>();
+            foreach (var question in quiz.Questions)
+            {
+                question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
+                questions.Add(question);
+                _questionRepository.Add(question);
+            }
+
+            if (questions == null || !questions.Any())
+            {
+                return BadRequest("Quiz must have at least one question.");
+            }
+
+            //quiz.QuizAttempts = new List<QuizAttempt>();
+
+            _quizRepository.Add(quiz);
+            return Ok("Posted Successfully");
+        }
+
+        #endregion
+
+        #region Add Questions to an Existing Quiz
+
+        [HttpPost("{id}/questions")]
+        public IActionResult AddQuestionsToExistingQuiz(string id, [FromBody] List<Question> questions)
+        {
+            if (questions == null || !questions.Any())
+            {
+                return BadRequest("Questions cannot be null or empty.");
+            }
+
+            var quiz = _quizRepository.GetById(id);
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+
+            foreach (var question in questions)
+            {
+                question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
+                _questionRepository.Add(question);
+            }
+
+            //quiz.QuizAttempts = new List<QuizAttempt>();
+
+            return Ok("Questions added successfully.");
+        }
+
+        #endregion
+
+        #endregion
+    }
+}

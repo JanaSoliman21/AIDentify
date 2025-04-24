@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250424190430_QuizMigration1")]
+    partial class QuizMigration1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -333,7 +336,7 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Question", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("QuestionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CorrectAnswer")
@@ -351,7 +354,7 @@ namespace AIDentify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuestionId");
 
                     b.HasIndex("QuizId");
 
@@ -360,17 +363,17 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Quiz", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("QuizId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizId");
 
                     b.ToTable("Quiz");
                 });
 
             modelBuilder.Entity("AIDentify.Models.QuizAttempt", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("QuizAttemptId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("PointsEarned")
@@ -389,7 +392,7 @@ namespace AIDentify.Migrations
                     b.Property<string>("StudentId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("QuizAttemptId");
 
                     b.HasIndex("QuizId");
 
@@ -790,9 +793,11 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Question", b =>
                 {
-                    b.HasOne("AIDentify.Models.Quiz", null)
+                    b.HasOne("AIDentify.Models.Quiz", "Quiz")
                         .WithMany("Questions")
                         .HasForeignKey("QuizId");
+
+                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("AIDentify.Models.QuizAttempt", b =>
