@@ -168,12 +168,6 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Calculate Total Points for each Student
-
-
-
-        #endregion
-
         #endregion
     }
 }

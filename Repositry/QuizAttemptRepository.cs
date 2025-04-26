@@ -35,6 +35,12 @@ namespace AIDentify.Repositry
 
         public void Add(QuizAttempt quizAttempt)
         {
+            var student = _context.QuizAttempt.FirstOrDefault(s => s.StudentId == quizAttempt.StudentId).Student;
+            if (student != null)
+            {
+                student.QuizAttempts.Add(quizAttempt);
+            }
+            _context.Student.Update(student);
             _context.QuizAttempt.Add(quizAttempt);
             _context.SaveChanges();
         }
@@ -86,7 +92,10 @@ namespace AIDentify.Repositry
             var student = _context.Student.FirstOrDefault(s => s.Student_ID == studentId);
             if (student != null)
             {
-                student.TotalPOintsEarned += totalPoints;
+                long currentPoints = student.TotalPOintsEarned ?? 0;
+                currentPoints += totalPoints;
+                student.TotalPOintsEarned = currentPoints;
+                _context.Student.Update(student);
                 _context.SaveChanges();
             }
         }

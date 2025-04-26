@@ -49,5 +49,8 @@ namespace AIDentify.Models
         public int Level { get; set; }
 
         public long? TotalPOintsEarned { get; set; } = 0;
+
+        [ValidateNever]
+        public List<QuizAttempt>? QuizAttempts { get; set; } = new();
     }
 }
