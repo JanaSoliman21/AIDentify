@@ -28,10 +28,11 @@ namespace AIDentify.Service
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
 
+
                         // Get subscriptions that need to be updated
                         var expiredSubscriptions = dbContext.Subscription
-                            .Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
-                            .ToList();
+                        .Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
+                        .ToList();
 
                         if (expiredSubscriptions.Any())
                         {
@@ -48,11 +49,12 @@ namespace AIDentify.Service
                     // Wait for a set interval before running again
                     await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken); // Runs every hour
                 }
-            } catch (TaskCanceledException) 
+            }
+            catch (TaskCanceledException)
             {
                 throw new Exception("SubscriptionExpiration Task was canceled.");
             }
-            
+
         }
     }
 }

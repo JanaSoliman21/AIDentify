@@ -84,25 +84,30 @@ namespace AIDentify.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(string id, [FromBody] Subscription subscription)
         {
-            //if (subscription.Id == null)
-            //{
-            //    subscription.Id = id;
-            //}
-            //else if (id != subscription.Id)
-            //{
-            //    return BadRequest("ID in the URL does not match ID in the body.");
-            //}
-            subscription.Id = id;
             var existingSubscription = SubscriptionRepository.GetSubscription(subscription.Id);
+            // Check if the subscription exists
             if (existingSubscription == null)
             {
                 return NotFound("Subscription not found.");
             }
+
+            // Check if the plan exists
             if (subscription.PlanId == null || !PlanRepository.PlanExists(subscription.PlanId))
             {
                 return BadRequest("Plan not found.");
             }
-            SubscriptionRepository.UpdateSubscription(subscription);
+
+            // Update the Existing Plan
+            if (existingSubscription.PlanId != subscription.PlanId)
+            {
+                // Update the subscription end date based on the new plan
+                Plan plan = PlanRepository.Get(subscription.PlanId);
+                int duration = plan.Duration;
+                existingSubscription.EndDate = existingSubscription.StartDate.AddMonths(duration);
+                existingSubscription.WarningDate = existingSubscription.EndDate.AddDays(-7);
+            }
+
+            SubscriptionRepository.UpdateSubscription(existingSubscription);
             return Ok("Updated Successfully");
         }
 

@@ -125,29 +125,23 @@ namespace AIDentify.Controllers
         #region Create Questions for a new Quiz
 
         [HttpPost("new/questions")]
-        public IActionResult AddQuestionsToNewQuiz([FromBody] Quiz quiz)
+        public IActionResult AddQuestionsToNewQuiz([FromBody] List<Question> questions)
         {
-            if (quiz == null)
-            {
-                return BadRequest("Quiz cannot be null.");
-            }
-
-            quiz.Id = _idGenerator.GenerateId<Quiz>(ModelPrefix.Quiz);
-
-            List<Question> questions = new List<Question>();
-            foreach (var question in quiz.Questions)
-            {
-                question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
-                questions.Add(question);
-                _questionRepository.Add(question);
-            }
-
             if (questions == null || !questions.Any())
             {
                 return BadRequest("Quiz must have at least one question.");
             }
 
-            //quiz.QuizAttempts = new List<QuizAttempt>();
+            Quiz quiz = new Quiz{
+                Id = _idGenerator.GenerateId<Quiz>(ModelPrefix.Quiz),
+            };
+
+            foreach (var question in questions)
+            {
+                question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
+                _questionRepository.Add(question);
+                quiz.Questions.Add(question);
+            }
 
             _quizRepository.Add(quiz);
             return Ok("Posted Successfully");

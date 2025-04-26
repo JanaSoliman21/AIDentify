@@ -17,7 +17,7 @@ namespace AIDentify.Models
         public string CorrectAnswer { get; set; }
 
         [Required]
-        public List<string> Options { get; set; }
+        public List<string> Options { get; set; } = new List<string>();
 
         //public string? QuizId { get; set; }
         //[ValidateNever]

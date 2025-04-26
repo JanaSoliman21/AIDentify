@@ -46,7 +46,7 @@ namespace AIDentify
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
             builder.Services.AddScoped<IdGenerator>();
             builder.Services.AddHostedService<SubscriptionExpirationService>();
-            //builder.Services.AddHostedService<SubscriptionFilteringService>();    // Not Finished Yet
+            builder.Services.AddHostedService<SubscriptionFilteringService>();
             builder.Services.AddHostedService<PlanUpdatingService>();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {

@@ -26,7 +26,7 @@ namespace AIDentify.Models
         public Quiz? Quiz { get; set; }
 
         [Required]
-        public List<string> SelectedAnswers { get; set; }
+        public List<string> SelectedAnswers { get; set; } = new List<string>();
 
         [Required]
         public int PointsEarned { get; set; }

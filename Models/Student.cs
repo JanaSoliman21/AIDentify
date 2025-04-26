@@ -41,6 +41,7 @@ namespace AIDentify.Models
 
         [ValidateNever]
         public List<Payment>? Payments { get; set; } = new();
+
         [Required]
         public string University { get; set; }
 

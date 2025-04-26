@@ -11,13 +11,19 @@ namespace AIDentify.Controllers
     public class QuizAttemptController: ControllerBase
     {
         private readonly IQuizAttemptRepository _quizAttemptRepository;
+        //private readonly IQuestionRepository _questionRepository;
+        private readonly IQuizRepository _quizRepository;
         private readonly IdGenerator _idGenerator;
 
-        public QuizAttemptController(IQuizAttemptRepository quizAttemptRepository, IdGenerator idGenerator)
+        public QuizAttemptController(IQuizAttemptRepository quizAttemptRepository, IdGenerator idGenerator, IQuizRepository quizRepository)
         {
             _quizAttemptRepository = quizAttemptRepository;
+            //_questionRepository = questionRepository;
+            _quizRepository = quizRepository;
             _idGenerator = idGenerator;
         }
+
+        #region Normal CRUD Methods
 
         #region Get All Quiz Attempts
 
@@ -110,6 +116,55 @@ namespace AIDentify.Controllers
             _quizAttemptRepository.DeleteAll();
             return Ok("All quiz attempts deleted successfully.");
         }
+
+        #endregion
+
+        #endregion
+
+        #region Custom Methods
+
+        #region Start a Quiz Attempts by Student ID
+
+        [HttpPost("start/{studentId}/{quizId}")]
+        public IActionResult StartQuiz(string studentId, string quizId, [FromBody] List<string> answers)
+        {
+            var quiz = _quizRepository.GetById(quizId);
+            if (quiz == null)
+            {
+                return BadRequest("There is no such a quiz.");
+            }
+
+            if (answers == null || !answers.Any())
+            {
+                return BadRequest("Answers cannot be null or empty.");
+            }
+
+            int points = 0;
+            foreach (string answer in answers)
+            {
+                foreach (var question in quiz.Questions)
+                {
+                    if (question.CorrectAnswer == answer)
+                    {
+                        points++;
+                    }
+                }
+            }
+
+            var quizAttempt = new QuizAttempt
+            {
+                Id = _idGenerator.GenerateId<QuizAttempt>(ModelPrefix.QuizAttempt),
+                StudentId = studentId,
+                QuizId = quizId,
+                SelectedAnswers = answers,
+                PointsEarned = points
+            };
+
+            _quizAttemptRepository.Add(quizAttempt);
+            return Ok("Quiz attempt started successfully." + " Your points: " + points);
+        }
+
+        #endregion
 
         #endregion
     }

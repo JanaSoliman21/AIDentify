@@ -3,12 +3,10 @@ using AIDentify.Models.Enums;
 
 namespace AIDentify.Service
 {
-    using AIDentify.Models;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using System;
     using System.Linq;
-    using System.Numerics;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -31,46 +29,53 @@ namespace AIDentify.Service
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
 
-                        // Get subscriptions that need to be updated
-                        var Subscriptions = dbContext.Subscription.ToList();
+                        var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
 
+                        //var expiredSubscriptions = dbContext.Subscription
+                        //.Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
+                        //.ToList();
 
-                        if (Subscriptions.Any())
+                        //if (expiredSubscriptions.Any())
+                        //{
+                        //    foreach (var subscription in expiredSubscriptions)
+                        //    {
+                        //        subscription.Status = SubscriptionStatus.Expired;
+                        //        //subscription.IsPaid = false; // Assuming you want to set IsPaid to false when expired
+                        //    }
+                        //}
+
+                        foreach (var subscription in subscriptions)
                         {
-                            foreach (var subscription in Subscriptions)
-                            {
-                                DateTime endDate = subscription.EndDate;
-                                DateTime warningDate = subscription.WarningDate;
-                                var plan = dbContext.Plan.Where(p => p.Id == subscription.PlanId)
-                                    .AsNoTracking()
-                                    .FirstOrDefault(p => p.Id == subscription.PlanId);
-                                if (plan != null)
-                                {
-                                    int duration = plan.Duration;
-                                    if (duration < 12 && duration >= 0)
-                                    {
-                                        endDate = subscription.StartDate.AddMonths(duration);
-                                        warningDate = endDate.AddDays(-7);
-                                    }
-                                    else if (duration > 12)
-                                    {
-                                        int yDuration = duration / 12;
-                                        int restOfDuration = duration % 12;
-                                        endDate = subscription.StartDate.AddYears(yDuration).AddMonths(restOfDuration);
-                                        warningDate = endDate.AddDays(-7);
-                                    }
+                            if (subscription.StartDate == default || subscription.Plan == null)
+                                continue;
 
-                                    subscription.EndDate = endDate;
-                                    subscription.WarningDate = warningDate;
-                                }
+                            int duration = subscription.Plan.Duration;
+                            DateTime newEndDate, warningDate;
+                            DateTime startDate = subscription.StartDate;
+
+                            if (duration < 12)
+                            {
+                                newEndDate = startDate.AddMonths(duration);
+                            }
+                            else
+                            {
+                                int years = duration / 12;
+                                int months = duration % 12;
+                                newEndDate = startDate.AddYears(years).AddMonths(months);
                             }
 
-                            await dbContext.SaveChangesAsync();
+                            warningDate = newEndDate.AddDays(-7);
+                            subscription.EndDate = newEndDate;
+                            subscription.WarningDate = warningDate;
                         }
+
+                        //await dbContext.SaveChangesAsync();
+                        await dbContext.SaveChangesAsync();
                     }
 
+
                     // Wait for a set interval before running again
-                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); // Runs every hour
+                    await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken); // Runs every hour
                 }
             }
             catch (TaskCanceledException)

@@ -9,9 +9,9 @@ namespace AIDentify.Models
         public string Id { get; set; } = string.Empty;
 
         [Required]
-        public List<Question> Questions { get; set; }
+        public List<Question> Questions { get; set; } = new List<Question>();
 
         [ValidateNever]
-        public List<QuizAttempt> QuizAttempts { get; set; }
+        public List<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
     }
 }
