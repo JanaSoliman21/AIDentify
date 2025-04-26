@@ -136,14 +136,16 @@ namespace AIDentify.Controllers
                 Id = _idGenerator.GenerateId<Quiz>(ModelPrefix.Quiz),
             };
 
+            _quizRepository.Add(quiz);
+
             foreach (var question in questions)
             {
                 question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
                 _questionRepository.Add(question);
+                _questionRepository.AddQuestionToQuiz(quiz.Id, question.Id);
                 quiz.Questions.Add(question);
             }
 
-            _quizRepository.Add(quiz);
             return Ok("Posted Successfully");
         }
 
@@ -169,9 +171,9 @@ namespace AIDentify.Controllers
             {
                 question.Id = _idGenerator.GenerateId<Question>(ModelPrefix.Question);
                 _questionRepository.Add(question);
+                _questionRepository.AddQuestionToQuiz(quiz.Id, question.Id);
+                quiz.Questions.Add(question);
             }
-
-            //quiz.QuizAttempts = new List<QuizAttempt>();
 
             return Ok("Questions added successfully.");
         }

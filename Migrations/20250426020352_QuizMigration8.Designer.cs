@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250426020352_QuizMigration8")]
+    partial class QuizMigration8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -790,11 +793,9 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Question", b =>
                 {
-                    b.HasOne("AIDentify.Models.Quiz", "Quiz")
+                    b.HasOne("AIDentify.Models.Quiz", null)
                         .WithMany("Questions")
                         .HasForeignKey("QuizId");
-
-                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("AIDentify.Models.QuizAttempt", b =>

@@ -78,5 +78,19 @@ namespace AIDentify.Repositry
         }
 
         #endregion
+
+        #region Increment Score for Student (Unfinished)
+
+        public void IncrementTotalPointsForStudent(string studentId, int totalPoints)
+        {
+            var student = _context.Student.FirstOrDefault(s => s.Student_ID == studentId);
+            if (student != null)
+            {
+                student.TotalPOintsEarned += totalPoints;
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
     }
 }

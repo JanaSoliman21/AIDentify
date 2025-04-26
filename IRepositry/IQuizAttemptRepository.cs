@@ -10,5 +10,6 @@ namespace AIDentify.IRepositry
         void Update(QuizAttempt quizAttempt);
         void Delete(QuizAttempt quizAttempt);
         void DeleteAll();
+        void IncrementTotalPointsForStudent(string studentId, int totalPoints);
     }
 }

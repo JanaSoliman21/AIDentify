@@ -48,6 +48,6 @@ namespace AIDentify.Models
         [Required]
         public int Level { get; set; }
 
-        public long? TotalPOintsEarned { get; set; }
+        public long? TotalPOintsEarned { get; set; } = 0;
     }
 }

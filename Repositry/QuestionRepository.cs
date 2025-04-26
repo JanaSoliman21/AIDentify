@@ -42,6 +42,22 @@ namespace AIDentify.Repositry
 
         #endregion
 
+        #region Add Question to a Specific Quiz
+
+        public void AddQuestionToQuiz(string quizId, string questionId)
+        {
+            var quiz = _context.Quiz.FirstOrDefault(q => q.Id == quizId);
+            var question = _context.Question.FirstOrDefault(q => q.Id == questionId);
+            if (quiz != null && question != null)
+            {
+                question.QuizId = quizId;
+                _context.Question.Update(question);
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
+
         #region Update
 
         public void Update(Question question)
@@ -80,5 +96,15 @@ namespace AIDentify.Repositry
         }
 
         #endregion
+
+        #region Find by Quiz Id
+
+        public List<Question> FindByQuizId(string quizId)
+        {
+            return _context.Question.Where(q => q.QuizId == quizId).ToList();
+        }
+
+        #endregion
+
     }
 }

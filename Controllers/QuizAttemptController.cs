@@ -11,14 +11,14 @@ namespace AIDentify.Controllers
     public class QuizAttemptController: ControllerBase
     {
         private readonly IQuizAttemptRepository _quizAttemptRepository;
-        //private readonly IQuestionRepository _questionRepository;
+        private readonly IQuestionRepository _questionRepository;
         private readonly IQuizRepository _quizRepository;
         private readonly IdGenerator _idGenerator;
 
-        public QuizAttemptController(IQuizAttemptRepository quizAttemptRepository, IdGenerator idGenerator, IQuizRepository quizRepository)
+        public QuizAttemptController(IQuizAttemptRepository quizAttemptRepository, IdGenerator idGenerator, IQuizRepository quizRepository, IQuestionRepository questionRepository)
         {
             _quizAttemptRepository = quizAttemptRepository;
-            //_questionRepository = questionRepository;
+            _questionRepository = questionRepository;
             _quizRepository = quizRepository;
             _idGenerator = idGenerator;
         }
@@ -140,14 +140,13 @@ namespace AIDentify.Controllers
             }
 
             int points = 0;
-            foreach (string answer in answers)
+            List<Question> questions = _questionRepository.FindByQuizId(quizId);
+
+            for(int i = 0; i < questions.Count; i++)
             {
-                foreach (var question in quiz.Questions)
+                if (answers[i] == questions[i].CorrectAnswer)
                 {
-                    if (question.CorrectAnswer == answer)
-                    {
-                        points++;
-                    }
+                    points++;
                 }
             }
 
@@ -160,9 +159,18 @@ namespace AIDentify.Controllers
                 PointsEarned = points
             };
 
+            // Increment total points for the student
+            _quizAttemptRepository.IncrementTotalPointsForStudent(studentId, points);   // Unfinished method in repository
+
             _quizAttemptRepository.Add(quizAttempt);
             return Ok("Quiz attempt started successfully." + " Your points: " + points);
         }
+
+        #endregion
+
+        #region Calculate Total Points for each Student
+
+
 
         #endregion
 

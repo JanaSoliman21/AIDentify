@@ -19,10 +19,10 @@ namespace AIDentify.Models
         [Required]
         public List<string> Options { get; set; } = new List<string>();
 
-        //public string? QuizId { get; set; }
-        //[ValidateNever]
-        //[ForeignKey(nameof(QuizId))]
-        //[JsonIgnore]
-        //public Quiz? Quiz { get; set; }
+        public string? QuizId { get; set; }
+        [ValidateNever]
+        [ForeignKey(nameof(QuizId))]
+        [JsonIgnore]
+        public Quiz? Quiz { get; set; }
     }
 }
