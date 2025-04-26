@@ -55,6 +55,38 @@ namespace AIDentify.Repositry
 
         #endregion
 
+        #region Deleteable
+
+        public bool Deleteable(Quiz quiz)
+        {
+            var attachedQuestions = _context.Question.Where(s => s.QuizId == quiz.Id).ToList();
+            if (attachedQuestions.Any())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
+
+        #region Unattach Questions
+
+        public void UnattachQuestions(Quiz quiz)
+        {
+            var attachedQuestions = _context.Question.Where(s => s.QuizId == quiz.Id).ToList();
+            if (attachedQuestions.Any())
+            {
+                foreach (var question in attachedQuestions)
+                {
+                    question.QuizId = null;
+                    _context.Question.Update(question);
+                }
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
+
         #region Delete
 
         public void Delete(Quiz quiz)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace AIDentify.Models
 {
@@ -7,21 +8,20 @@ namespace AIDentify.Models
         [Key]
         public string Id { get; set; } = string.Empty;
 
-        [Required]
-        public string PlanName { get; set; }
+        [ValidateNever]
+        public string PlanName { get; set; } = string.Empty;
 
-        [Required]
-        public int Duration { get; set; }   // in months
+        [ValidateNever]
+        public int Duration { get; set; } = -1;  // in months
 
-        [Required]
-        public int MaxScans { get; set; }
+        [ValidateNever]
+        public int MaxScans { get; set; } = -1;
 
-        [Required]
-        public int MaxPatients { get; set; }
+        [ValidateNever]
+        public int MaxPatients { get; set; } = -1;
 
-        [Required]
-        [Range(7,20)]
-        public long Price { get; set; }
+        [ValidateNever]
+        public long Price { get; set; } = -1;
 
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum WayOfPayment
     {
+        None,
         Card,
         Cash
     }

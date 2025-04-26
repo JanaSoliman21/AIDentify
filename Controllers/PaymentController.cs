@@ -126,9 +126,16 @@ namespace AIDentify.Controllers
                 }
 
                 // Update payment details
-                existingPayment.Amount = payment.Amount;
+                if(payment.WayOfPayment != WayOfPayment.None)
+                {
+                    existingPayment.WayOfPayment = payment.WayOfPayment;
+                }
+                if(payment.Amount != -1)
+                {
+                    existingPayment.Amount = payment.Amount;
+                }
                 existingPayment.PaymentDate = DateTime.Now;
-                existingPayment.WayOfPayment = payment.WayOfPayment;
+                
 
                 _paymentRepository.Update(userId, existingPayment);
 

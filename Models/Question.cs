@@ -10,13 +10,13 @@ namespace AIDentify.Models
         [Key]
         public string Id { get; set; } = string.Empty;
 
-        [Required]
-        public string TheQuestion { get; set; }
+        [ValidateNever]
+        public string TheQuestion { get; set; } = string.Empty;
 
-        [Required]
-        public string CorrectAnswer { get; set; }
+        [ValidateNever]
+        public string CorrectAnswer { get; set; } = string.Empty;
 
-        [Required]
+        [ValidateNever]
         public List<string> Options { get; set; } = new List<string>();
 
         public string? QuizId { get; set; }

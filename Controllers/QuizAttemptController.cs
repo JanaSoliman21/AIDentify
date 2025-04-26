@@ -71,24 +71,24 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Update Quiz Attempt
+        #region Update Quiz Attempt (Commented)
 
-        [HttpPut("{id}")]
-        public IActionResult Update(string id, [FromBody] QuizAttempt quizAttempt)
-        {
-            if (quizAttempt == null)
-            {
-                return BadRequest("Quiz attempt cannot be null.");
-            }
-            var existingQuizAttempt = _quizAttemptRepository.GetById(id);
-            if (existingQuizAttempt == null)
-            {
-                return NotFound("Quiz attempt not found.");
-            }
-            quizAttempt.Id = id;
-            _quizAttemptRepository.Update(quizAttempt);
-            return Ok("Updated Successfully");
-        }
+        //[HttpPut("{id}")]
+        //public IActionResult Update(string id, [FromBody] QuizAttempt quizAttempt)
+        //{
+        //    if (quizAttempt == null)
+        //    {
+        //        return BadRequest("Quiz attempt cannot be null.");
+        //    }
+        //    var existingQuizAttempt = _quizAttemptRepository.GetById(id);
+        //    if (existingQuizAttempt == null)
+        //    {
+        //        return NotFound("Quiz attempt not found.");
+        //    }
+        //    quizAttempt.Id = id;
+        //    _quizAttemptRepository.Update(quizAttempt);
+        //    return Ok("Updated Successfully");
+        //}
 
         #endregion
 
@@ -108,14 +108,14 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Delete All Quiz Attempts
+        #region Delete All Quiz Attempts (Commented)
 
-        [HttpDelete]
-        public IActionResult DeleteAll()
-        {
-            _quizAttemptRepository.DeleteAll();
-            return Ok("All quiz attempts deleted successfully.");
-        }
+        //[HttpDelete]
+        //public IActionResult DeleteAll()
+        //{
+        //    _quizAttemptRepository.DeleteAll();
+        //    return Ok("All quiz attempts deleted successfully.");
+        //}
 
         #endregion
 

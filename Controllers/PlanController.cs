@@ -46,6 +46,28 @@ namespace AIDentify.Controllers
         public IActionResult Add([FromBody] Plan plan)
         {
             plan.Id = _idGenerator.GenerateId<Plan>(ModelPrefix.Plan);
+
+            if(plan.PlanName == string.Empty)
+            {
+                return BadRequest("Plan name cannot be empty.");
+            }
+            if (plan.Duration == -1)
+            {
+                return BadRequest("Duration cannot be empty.");
+            }
+            if (plan.MaxScans == -1)
+            {
+                return BadRequest("Max Scans cannot be empty.");
+            }
+            if (plan.MaxPatients == -1)
+            {
+                return BadRequest("Max Patients cannot be empty.");
+            }
+            if (plan.Price == -1)
+            {
+                return BadRequest("Price cannot be empty.");
+            }
+
             PlanRepository.Add(plan);
             return Ok("Posted Successfully");
         }
@@ -57,19 +79,40 @@ namespace AIDentify.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(string id, [FromBody] Plan plan)
         {
-            //if (id != plan.Id)
-            //{
-            //    return BadRequest("ID in the URL does not match ID in the body.");
-            //}
             plan.Id = id;
 
-            var existingPlan = PlanRepository.Get(plan.Id);
+            var existingPlan = PlanRepository.Get(id);
             if (existingPlan == null)
             {
                 return NotFound("Plan not found.");
             }
 
-            PlanRepository.Update(plan);
+            // Update the old plan with the new values
+            if (plan.PlanName == string.Empty)
+            {
+                plan.PlanName = existingPlan.PlanName;
+            }
+            if (plan.Duration == -1)
+            {
+                plan.Duration = existingPlan.Duration;
+            }
+            if (plan.MaxScans == -1)
+            {
+                plan.MaxScans = existingPlan.MaxScans;
+            }
+            if (plan.MaxPatients == -1)
+            {
+                plan.MaxPatients = existingPlan.MaxPatients;
+            }
+            if (plan.Price == -1)
+            {
+                plan.Price = existingPlan.Price;
+            }
+
+            // Update the plan in the repository
+            existingPlan = plan;
+
+            PlanRepository.Update(existingPlan);
 
             return Ok("Updated Successfully");
         }

@@ -3,6 +3,7 @@ using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify.Controllers
 {
@@ -71,24 +72,24 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Update Quiz
+        #region Update Quiz (Unfinished)
 
-        [HttpPut("{id}")]
-        public IActionResult Update(string id, [FromBody] Quiz quiz)
-        {
-            if (quiz == null)
-            {
-                return BadRequest("Quiz cannot be null.");
-            }
-            var existingQuiz = _quizRepository.GetById(id);
-            if (existingQuiz == null)
-            {
-                return NotFound("Quiz not found.");
-            }
-            quiz.Id = id;
-            _quizRepository.Update(quiz);
-            return Ok("Updated Successfully");
-        }
+        //[HttpPut("{id}")]
+        //public IActionResult Update(string id, [FromBody] Quiz quiz)
+        //{
+        //    if (quiz == null)
+        //    {
+        //        return BadRequest("Quiz cannot be null.");
+        //    }
+        //    var existingQuiz = _quizRepository.GetById(id);
+        //    if (existingQuiz == null)
+        //    {
+        //        return NotFound("Quiz not found.");
+        //    }
+        //    quiz.Id = id;
+        //    _quizRepository.Update(quiz);
+        //    return Ok("Updated Successfully");
+        //}
 
         #endregion
 
@@ -102,19 +103,26 @@ namespace AIDentify.Controllers
             {
                 return NotFound("Quiz not found.");
             }
+            if (_quizRepository.Deleteable(quiz))
+            {
+                _quizRepository.Delete(quiz);
+                return Ok("Deleted Successfully");
+            }
+            _quizRepository.UnattachQuestions(quiz);
             _quizRepository.Delete(quiz);
             return Ok("Deleted Successfully");
         }
 
         #endregion
 
-        #region Delete All Quizzes
-        [HttpDelete]
-        public IActionResult DeleteAll()
-        {
-            _quizRepository.DeleteAll();
-            return Ok("All quizzes deleted successfully.");
-        }
+        #region Delete All Quizzes (Commented)
+
+        //[HttpDelete]
+        //public IActionResult DeleteAll()
+        //{
+        //    _quizRepository.DeleteAll();
+        //    return Ok("All quizzes deleted successfully.");
+        //}
 
         #endregion
 

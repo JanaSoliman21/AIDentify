@@ -8,6 +8,8 @@ namespace AIDentify.IRepositry
         Quiz GetById(string id);
         void Add(Quiz quiz);
         void Update(Quiz quiz);
+        bool Deleteable(Quiz quiz);
+        void UnattachQuestions(Quiz quiz);
         void Delete(Quiz quiz);
         void DeleteAll();
     }

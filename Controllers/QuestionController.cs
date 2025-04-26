@@ -4,6 +4,7 @@ using AIDentify.Models;
 using AIDentify.Models.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.Reflection.Emit;
 
 namespace AIDentify.Controllers
@@ -76,13 +77,28 @@ namespace AIDentify.Controllers
             {
                 return BadRequest("Question cannot be null.");
             }
+            if(question.TheQuestion == string.Empty)
+            {
+                return BadRequest("Question cannot be empty.");
+            }
+            if(question.CorrectAnswer == string.Empty)
+            {
+                return BadRequest("Answer cannot be empty.");
+            }
+            if (question.Options == null || question.Options.Count == 0)
+            {
+                return BadRequest("Options cannot be empty.");
+            }
+
             question.Id = id;
             var existingQuestion = _questionRepository.GetById(id);
             if (existingQuestion == null)
             {
                 return NotFound("Question not found.");
             }
-            _questionRepository.Update(question);
+            question.QuizId = existingQuestion.QuizId;
+            existingQuestion = question;
+            _questionRepository.Update(existingQuestion);
             return Ok("Updated Successfully.");
         }
 
@@ -104,14 +120,14 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Delete All Questions
+        #region Delete All Questions (Commented)
 
-        [HttpDelete]
-        public ActionResult DeleteAll()
-        {
-            _questionRepository.DeleteAll();
-            return Ok("All questions deleted successfully.");
-        }
+        //[HttpDelete]
+        //public ActionResult DeleteAll()
+        //{
+        //    _questionRepository.DeleteAll();
+        //    return Ok("All questions deleted successfully.");
+        //}
 
         #endregion
     }

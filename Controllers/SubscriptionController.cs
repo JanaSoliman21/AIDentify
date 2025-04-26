@@ -84,7 +84,7 @@ namespace AIDentify.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(string id, [FromBody] Subscription subscription)
         {
-            var existingSubscription = SubscriptionRepository.GetSubscription(subscription.Id);
+            var existingSubscription = SubscriptionRepository.GetSubscription(id);
             // Check if the subscription exists
             if (existingSubscription == null)
             {
@@ -102,6 +102,7 @@ namespace AIDentify.Controllers
             {
                 // Update the subscription end date based on the new plan
                 Plan plan = PlanRepository.Get(subscription.PlanId);
+                existingSubscription.PlanId = plan.Id;
                 int duration = plan.Duration;
                 existingSubscription.EndDate = existingSubscription.StartDate.AddMonths(duration);
                 existingSubscription.WarningDate = existingSubscription.EndDate.AddDays(-7);

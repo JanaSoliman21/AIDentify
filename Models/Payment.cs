@@ -16,8 +16,7 @@ namespace AIDentify.Models
         public WayOfPayment WayOfPayment { get; set; }
 
         [Required]
-        [Range (5, 100)]
-        public long Amount {  get; set; }
+        public long Amount { get; set; } = -1;
 
         [Required]
         public DateTime PaymentDate { get; set; }

@@ -65,10 +65,11 @@ namespace AIDentify.Repositry
             var existingQuestion = _context.Question.FirstOrDefault(q => q.Id == question.Id);
             if (existingQuestion != null)
             {
-                _context.Question.Update(question);
+                _context.Entry(existingQuestion).CurrentValues.SetValues(question);
                 _context.SaveChanges();
             }
         }
+
 
         #endregion
 
