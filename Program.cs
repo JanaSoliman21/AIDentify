@@ -1,5 +1,4 @@
-
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using AIDentify.Extension;
 using AIDentify.ID_Generator;
 using AIDentify.IRepositry;
@@ -8,8 +7,6 @@ using AIDentify.Models.Context;
 using AIDentify.Repositry;
 using AIDentify.Service;
 using Microsoft.AspNetCore.Identity;
-
-//using AIDentify.Repositry;
 using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify
@@ -27,11 +24,9 @@ namespace AIDentify
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Register the DbContext with the dependency injection container
             builder.Services.AddDbContext<ContextAIDentify>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -59,15 +54,26 @@ namespace AIDentify
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 });
 
-
             builder.Services.AddCustomJwtAuth(builder.Configuration);
+
+            // ✅ Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
 
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
-
+            builder.Services.AddLogging();
             var app = builder.Build();
+            app.UseCors("AllowAll");
             app.UseMiddleware<TokenBlacklistMiddleware>();
 
             // Configure the HTTP request pipeline.
@@ -78,9 +84,17 @@ namespace AIDentify
             }
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            //app.UseCors("AllowFrontend");
+
+
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
+
             app.Run();
         }
     }
