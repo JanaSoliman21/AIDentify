@@ -15,14 +15,15 @@ namespace AIDentify.Controllers
     [ApiController]
     public class ModelsController : ControllerBase
     {
-
+        private readonly ILogger<ModelsController> _logger;
         private readonly HttpClient _httpClient;
         private readonly ContextAIDentify context;
 
-        public ModelsController(HttpClient httpClient, ContextAIDentify context)
+        public ModelsController(HttpClient httpClient, ContextAIDentify context, ILogger<ModelsController> logger)
         {
             _httpClient = httpClient;
             this.context = context;
+            _logger = logger;
         }
 
         [HttpPost("predict_Age")]
@@ -87,6 +88,69 @@ namespace AIDentify.Controllers
 
             }
 
+        //[HttpPost("predict_Gender")]
+        //public async Task<IActionResult> PredictGender([FromForm] ModelsDto request)
+        //{
+        //    var pythonApiUrl = "https://amrgamall2003-gp-api.hf.space/api/gender/detect";
+
+        //    if (request.File == null || request.File.Length == 0)
+        //    {
+        //        return BadRequest("No file uploaded.");
+        //    }
+        //    byte[] fileBytes;
+        //    using (var ms = new MemoryStream())
+        //    {
+        //        await request.File.CopyToAsync(ms);
+        //        fileBytes = ms.ToArray();
+        //    }
+        //    var fileContent = new ByteArrayContent(fileBytes);
+        //    fileContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("image/jpeg");
+
+        //    var form = new MultipartFormDataContent();
+        //    form.Add(fileContent, "file", request.File.FileName);
+
+        //    var xRayScan = new XRayScan
+        //    {
+        //        ScanId = "SCAN-" + Guid.NewGuid().ToString("N").Substring(0, 8),
+        //        ImagePath = request.File.FileName,
+        //        ScanDate = DateTime.UtcNow
+        //    };
+        //    context.XRayScan.Add(xRayScan);
+        //    await context.SaveChangesAsync();
+
+        //    var response = await _httpClient.PostAsync(pythonApiUrl, form);
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        var errMsg = await response.Content.ReadAsStringAsync();
+        //        return BadRequest($"Error calling the Gender prediction API: {errMsg}");
+        //    }
+        //    var responseString = await response.Content.ReadAsStringAsync();
+
+        //    var predictionResult = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
+        //    if (predictionResult == null || !predictionResult.ContainsKey("gender"))
+        //    {
+        //        return BadRequest("Invalid response from AI model.");
+        //    }
+        //    if (Enum.TryParse(predictionResult["gender"], out Gender predictedGender))
+        //    {
+        //        xRayScan.PredictedGenderGroup = predictedGender;
+        //        context.XRayScan.Update(xRayScan);
+        //        await context.SaveChangesAsync();
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to parse Gender prediction.");
+
+        //    }
+        //    return Ok(new
+        //    {
+        //        message = "Prediction stored successfully",
+        //        predictedGender
+        //    });
+
+        //}
+
+
         [HttpPost("predict_Gender")]
         public async Task<IActionResult> PredictGender([FromForm] ModelsDto request)
         {
@@ -94,8 +158,12 @@ namespace AIDentify.Controllers
 
             if (request.File == null || request.File.Length == 0)
             {
+                _logger.LogError("No file uploaded.");
                 return BadRequest("No file uploaded.");
             }
+
+            _logger.LogInformation("Received file for gender prediction: {FileName}, File Size: {FileSize} bytes", request.File.FileName, request.File.Length);
+
             byte[] fileBytes;
             using (var ms = new MemoryStream())
             {
@@ -121,16 +189,21 @@ namespace AIDentify.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 var errMsg = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Error calling the Gender prediction API: {ErrorMessage}", errMsg);
                 return BadRequest($"Error calling the Gender prediction API: {errMsg}");
             }
-            var responseString = await response.Content.ReadAsStringAsync();
 
+            var responseString = await response.Content.ReadAsStringAsync();
             var predictionResult = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
+
             if (predictionResult == null || !predictionResult.ContainsKey("gender"))
             {
+                _logger.LogError("Invalid response from AI model.");
                 return BadRequest("Invalid response from AI model.");
             }
-            if (Enum.TryParse(predictionResult["gender"], out Gender predictedGender))
+
+            Gender predictedGender;
+            if (Enum.TryParse(predictionResult["gender"], out predictedGender))
             {
                 xRayScan.PredictedGenderGroup = predictedGender;
                 context.XRayScan.Update(xRayScan);
@@ -138,15 +211,16 @@ namespace AIDentify.Controllers
             }
             else
             {
+                _logger.LogError("Failed to parse Gender prediction.");
                 return BadRequest("Failed to parse Gender prediction.");
-
             }
+
+            _logger.LogInformation("Gender prediction successful: {PredictedGender}", predictedGender);
             return Ok(new
             {
                 message = "Prediction stored successfully",
                 predictedGender
             });
-
         }
 
         [HttpPost("predict_Teeth")]
