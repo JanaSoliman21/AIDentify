@@ -52,22 +52,22 @@ namespace AIDentify.Controllers
             }
             return Ok(quizAttempt);
         }
-        
+
         #endregion
-        
-        #region Add New Quiz Attempt
-        
-        [HttpPost]
-        public IActionResult Add([FromBody] QuizAttempt quizAttempt)
-        {
-            if (quizAttempt == null)
-            {
-                return BadRequest("Quiz attempt cannot be null.");
-            }
-            quizAttempt.Id = _idGenerator.GenerateId<QuizAttempt>(ModelPrefix.QuizAttempt);
-            _quizAttemptRepository.Add(quizAttempt);
-            return Ok("Posted Successfully");
-        }
+
+        #region Add New Quiz Attempt (Commented)
+
+        //[HttpPost]
+        //public IActionResult Add([FromBody] QuizAttempt quizAttempt)
+        //{
+        //    if (quizAttempt == null)
+        //    {
+        //        return BadRequest("Quiz attempt cannot be null.");
+        //    }
+        //    quizAttempt.Id = _idGenerator.GenerateId<QuizAttempt>(ModelPrefix.QuizAttempt);
+        //    _quizAttemptRepository.Add(quizAttempt);
+        //    return Ok("Posted Successfully");
+        //}
 
         #endregion
 

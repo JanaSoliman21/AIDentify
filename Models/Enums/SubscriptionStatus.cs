@@ -2,6 +2,7 @@
 {
     public enum SubscriptionStatus
     {
+        Avalable,
         Active,
         Expired
     }

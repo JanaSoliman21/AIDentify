@@ -85,6 +85,27 @@ namespace AIDentify.Repositry
 
         #endregion
 
+        #region Check Plan's Price Difference When Updating Plan
+
+        public long DealWithPlanPriceDifference(Subscription subscription, string newPlanId)
+        {
+            long difference = 0;
+
+            var newPlan = _context.Plan.Find(newPlanId);
+            var oldPlan = subscription.Plan;
+            if (oldPlan != null && newPlan != null)
+            {
+                long oldPlanPrice = oldPlan.Price;
+                long newPlanPrice = newPlan.Price;
+
+                difference = newPlanPrice - oldPlanPrice;
+            }
+
+            return difference;
+        }
+
+        #endregion
+
         #region Delete Subscription
 
         public void DeleteSubscription(Subscription subscription)

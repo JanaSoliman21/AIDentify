@@ -35,13 +35,13 @@ namespace AIDentify.Repositry
 
         public void Add(QuizAttempt quizAttempt)
         {
-            var student = _context.QuizAttempt.FirstOrDefault(s => s.StudentId == quizAttempt.StudentId).Student;
+            var student = _context.Student.FirstOrDefault(s => s.Student_ID == quizAttempt.StudentId);
             if (student != null)
             {
                 student.QuizAttempts.Add(quizAttempt);
             }
-            _context.Student.Update(student);
             _context.QuizAttempt.Add(quizAttempt);
+            _context.Student.Update(student);
             _context.SaveChanges();
         }
 
