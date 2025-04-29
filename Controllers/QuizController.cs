@@ -188,6 +188,28 @@ namespace AIDentify.Controllers
 
         #endregion
 
+        #region Add an Existing Question to an Existing Quiz
+
+        [HttpPost("{quizId}/questions/{questionId}")]
+        public IActionResult AddExistingQuestionToQuiz(string quizId, string questionId)
+        {
+            var quiz = _quizRepository.GetById(quizId);
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+            var question = _questionRepository.GetById(questionId);
+            if (question == null)
+            {
+                return NotFound("Question not found.");
+            }
+            _questionRepository.AddQuestionToQuiz(quiz.Id, question.Id);
+            quiz.Questions.Add(question);
+            return Ok("Question added to quiz successfully.");
+        }
+
+        #endregion
+
         #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify.Repositry
 {
@@ -26,8 +27,9 @@ namespace AIDentify.Repositry
 
         public Quiz GetById(string id)
         {
-            return _context.Quiz.FirstOrDefault(q => q.Id == id);
+            return _context.Quiz.Include(q => q.Questions).Include(q => q.QuizAttempts).FirstOrDefault(q => q.Id == id);
         }
+
 
         #endregion
 
