@@ -10,6 +10,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using AIDentify.IRepositry;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Threading.Tasks;
 
 namespace AIDentify.Controllers
 {
@@ -17,16 +20,14 @@ namespace AIDentify.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly ContextAIDentify context;
-        internal static readonly ConcurrentDictionary<string, DateTime> _blacklistedTokens = new();
+      
+        private readonly IIdentityRepo _identityRepo;
+        private readonly IUserRepositry userRepositry;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration configuration, ContextAIDentify context, SignInManager<ApplicationUser> signInManager)
+        public AccountController(IIdentityRepo _identityRepo, IUserRepositry userRepositry, SignInManager<ApplicationUser> signInManager)
         {
-            _userManager = userManager;
-            _configuration = configuration;
-            this.context = context;
+            this._identityRepo = _identityRepo;
+            this.userRepositry = userRepositry;
 
         }
         [HttpPost("Register_Admin")]
@@ -36,36 +37,21 @@ namespace AIDentify.Controllers
             {
                 return BadRequest(ModelState);
             }
-            ApplicationUser user1 = new ApplicationUser();
-            {
-                user1.FirstName = user.FirstName;
-                user1.LastName = user.LastName;
-                user1.UserName = user.Username;
-                user1.Email = user.Email;
-
-            }
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
-                return BadRequest(ModelState);
-            }
-            await _userManager.AddToRoleAsync(user1, "Admin");
             var admin = new Admin
             {
-                Admin_ID = user1.Id,
-                UserName = user1.UserName,
-                FirstName = user1.FirstName,
-                LastName = user1.LastName,
-                Email = user1.Email,
-                Password = user1.PasswordHash
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.Username,
+                Email = user.Email,
+                Password = user.Password
             };
 
-            context.Admin.Add(admin);
-            await context.SaveChangesAsync();
+            var(success, errors,CreateUser) = await _identityRepo.RegisterAsAdminAsync(admin);
+            if (!success || CreateUser == null)
+            {
+                return BadRequest(new { Errors = errors });
+            }
+            await userRepositry.AddAsAdminAsync(CreateUser);
             return Ok("Admin registered successfully");
         }
 
@@ -77,42 +63,23 @@ namespace AIDentify.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user1 = new ApplicationUser
+            var user1 = new Doctor
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.Username,
                 Email = user.Email,
+                Password = user.Password,
                 ClinicName = user.ClinicName
+
             };
 
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
-
-            if (!result.Succeeded)
+            var (success, errors, CreateUser) = await _identityRepo.RegisterAsDoctorAsync(user1);
+            if (!success || CreateUser == null)
             {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(new { Errors = errors });
             }
-
-            await _userManager.AddToRoleAsync(user1, "Doctor");
-
-
-            var doctor = new Doctor
-            {
-                Doctor_ID = user1.Id,
-                FirstName = user1.FirstName,
-                LastName = user1.LastName,
-                UserName = user1.UserName,
-                Email = user1.Email,
-                Password = user1.PasswordHash,
-                ClinicName = user1.ClinicName
-            };
-
-            context.Doctor.Add(doctor);
-            await context.SaveChangesAsync();
+            await userRepositry.AddAsDoctorAsync(CreateUser);
 
             return Ok("Doctor registered successfully");
         }
@@ -124,142 +91,59 @@ namespace AIDentify.Controllers
             {
                 return BadRequest(ModelState);
             }
-            ApplicationUser user1 = new ApplicationUser();
+            var user1 = new Student();
             {
                 user1.FirstName = user.FirstName;
                 user1.LastName = user.LastName;
                 user1.UserName = user.Username;
                 user1.Email = user.Email;
+                user1.Password = user.Password;
                 user1.University = user.University;
-                user1.Level = user.Level;
+                user1.Level = (int)user.Level;
             }
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
-            if (!result.Succeeded)
+            var (success, errors, CreateUser) = await _identityRepo.RegisterAsStudentAsync(user1);
+            if (!success || CreateUser == null)
             {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(new { Errors = errors });
             }
-            await _userManager.AddToRoleAsync(user1, "Student");
-            var student = new Student
-            {
-                Student_ID = user1.Id,
-                FirstName = user1.FirstName,
-                LastName = user1.LastName,
-                UserName = user1.UserName,
-                Email = user1.Email,
-                Password = user1.PasswordHash,
-                University = user1.University,
-                Level = (int)user1.Level
-            };
-
-            context.Student.Add(student);
-            await context.SaveChangesAsync();
+            await userRepositry.AddAsStudentAsync(CreateUser);
             return Ok("Student registered successfully");
-
-
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> LogIn(LoginDto login)
         {
-            if (ModelState.IsValid)
+            var result = await _identityRepo.LoginAsync(login.UserName, login.Password);
+            if(result.Success)
             {
-                ApplicationUser? user2 = await _userManager.FindByNameAsync(login.UserName);
-                if (user2 != null)
-                {
-                    if (await _userManager.CheckPasswordAsync(user2, login.Password))
-                    {
-
-                        //token
-                        var claims = new List<Claim>();
-                        //claims.Add(new Claim("name","value"));
-                        claims.Add(new Claim(ClaimTypes.Name, user2.UserName));
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, user2.Id));
-                        claims.Add(new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                        var roles = await _userManager.GetRolesAsync(user2);
-                        foreach (var role in roles)
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-
-                        }
-                        //signingCredentials
-                        var secretKey = _configuration["JWT:SecretKey"];
-                        if (string.IsNullOrEmpty(secretKey))
-                        {
-                            throw new ArgumentNullException("JWT:SecretKey", "JWT SecretKey is missing in configuration.");
-                        }
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-                        var sc = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                        var token = new JwtSecurityToken(
-                            claims: claims,
-                            issuer: _configuration["JWT:Issuer"],
-                            audience: _configuration["JWT:Audience"],
-                            expires: DateTime.Now.AddDays(30),
-                            signingCredentials: sc
-
-                            );
-                        var _token = new
-                        {
-                            token = new JwtSecurityTokenHandler().WriteToken(token),
-                            expiration = token.ValidTo,
-
-                        };
-                        return Ok(_token);
-                    }
-                    else
-                    {
-                        return Unauthorized();
-                    }
-                }
-                else
-                {
-
-                    ModelState.AddModelError("", "User Name is Invalid");
-                }
+                return Ok(new { tokens = result.Token, roles = result.Roles });
             }
-
-            return BadRequest(ModelState);
+            return BadRequest(result.Errors);  
         }
 
         [HttpPost("logout")]
         [Authorize]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            if (token == null)
+            var result = await _identityRepo.LogoutAsync(token);
+            if (!result.Success)
             {
-                return BadRequest(new { message = "No token provided" });
+                return BadRequest(new { message = "No token provided"});
             }
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-            var expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
-
-            if (expClaim == null)
-            {
-                return BadRequest(new { message = "Invalid token" });
-            }
-
-            var expiryDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim)).UtcDateTime;
-
-            _blacklistedTokens[token] = expiryDate;
-
-            return Ok(new { message = "Logged out successfully" });
+            return Ok(new { message = "Logged out successfully"});
         }
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgetPassDto model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _identityRepo.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
                 return BadRequest(new { message = "User not found" });
             }
 
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetToken = await _identityRepo.GetNewTokenAsync(user);
 
             var resetLink = $"{Request.Scheme}://{Request.Host}/api/Account/reset-password?token={resetToken}&email={model.Email}";
 
@@ -271,79 +155,79 @@ namespace AIDentify.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPassDto model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _identityRepo.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
                 return BadRequest(new { message = "User not found" });
             }
 
-            var resetResult = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
-            if (!resetResult.Succeeded)
-            {
-                return BadRequest(new { message = "Password reset failed", errors = resetResult.Errors });
-            }
+            //var resetResult = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            //if (!resetResult.Succeeded)
+            //{
+            //    return BadRequest(new { message = "Password reset failed", errors = resetResult.Errors });
+            //}
 
             return Ok(new { message = "Password reset successfully" });
         }
 
 
 
-        [HttpDelete("Delete_Account")]
-        [Authorize]
-        public async Task<IActionResult> DeleteAccount()
-        {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        //[HttpDelete("Delete_Account")]
+        //[Authorize]
+        //public async Task<IActionResult> DeleteAccount()
+        //{
+        //    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId == null)
-                return Unauthorized(new { message = "User is not logged in" });
+        //    if (userId == null)
+        //        return Unauthorized(new { message = "User is not logged in" });
 
-            var user = await _userManager.FindByIdAsync(userId);
+        //    var user = await _userManager.FindByIdAsync(userId);
 
-            if (user == null)
-                return NotFound(new { message = "User not found" });
+        //    if (user == null)
+        //        return NotFound(new { message = "User not found" });
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault();
+        //    var roles = await _userManager.GetRolesAsync(user);
+        //    var role = roles.FirstOrDefault();
 
-            if (role == "Doctor")
-            {
-                var doctor = await context.Doctor.FirstOrDefaultAsync(d => d.Doctor_ID == user.Id);
-                if (doctor != null)
-                {
-                    context.Doctor.Remove(doctor);
-                }
-            }
-            else if (role == "Student")
-            {
-                var student = await context.Student.FirstOrDefaultAsync(s => s.Student_ID == user.Id);
-                if (student != null)
-                {
-                    context.Student.Remove(student);
-                }
-            }
-            else if (role == "Admin")
-            {
-                var admin = await context.Admin.FirstOrDefaultAsync(a => a.Admin_ID == user.Id);
-                if (admin != null)
-                {
-                    context.Admin.Remove(admin);
-                }
-            }
-            else
-            {
-                return BadRequest(new { message = "Role not recognized" });
-            }
+        //    if (role == "Doctor")
+        //    {
+        //        var doctor = await context.Doctor.FirstOrDefaultAsync(d => d.Doctor_ID == user.Id);
+        //        if (doctor != null)
+        //        {
+        //            context.Doctor.Remove(doctor);
+        //        }
+        //    }
+        //    else if (role == "Student")
+        //    {
+        //        var student = await context.Student.FirstOrDefaultAsync(s => s.Student_ID == user.Id);
+        //        if (student != null)
+        //        {
+        //            context.Student.Remove(student);
+        //        }
+        //    }
+        //    else if (role == "Admin")
+        //    {
+        //        var admin = await context.Admin.FirstOrDefaultAsync(a => a.Admin_ID == user.Id);
+        //        if (admin != null)
+        //        {
+        //            context.Admin.Remove(admin);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new { message = "Role not recognized" });
+        //    }
 
-            await context.SaveChangesAsync();
+        //    await context.SaveChangesAsync();
 
-            var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
-            {
-                return Ok(new { message = $"{role} Account Deleted Successfully" });
-            }
+        //    var result = await _userManager.DeleteAsync(user);
+        //    if (result.Succeeded)
+        //    {
+        //        return Ok(new { message = $"{role} Account Deleted Successfully" });
+        //    }
 
-            return BadRequest(result.Errors);
-        }
+        //    return BadRequest(result.Errors);
+        //}
 
 
     }

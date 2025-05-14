@@ -1,12 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using AIDentify.Controllers;
+using AIDentify.Repositry;
 
 namespace AIDentify.Extension
 {
     public class TokenBlacklistMiddleware
     {
         private readonly RequestDelegate _next;
-        private static readonly ConcurrentDictionary<string, DateTime> _blacklistedTokens = AccountController._blacklistedTokens;
+        private static readonly ConcurrentDictionary<string, DateTime> _blacklistedTokens = IdentityRepo._blacklistedTokens;
 
         public TokenBlacklistMiddleware(RequestDelegate next)
         {
