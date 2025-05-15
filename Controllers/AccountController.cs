@@ -1,18 +1,10 @@
-﻿using AIDentify.Models.Context;
-using AIDentify.Models;
-using System.Collections.Concurrent;
+﻿using AIDentify.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AIDentify.DTO;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using AIDentify.IRepositry;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Threading.Tasks;
+
 
 namespace AIDentify.Controllers
 {
@@ -151,7 +143,6 @@ namespace AIDentify.Controllers
         }
 
 
-
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPassDto model)
         {
@@ -161,73 +152,74 @@ namespace AIDentify.Controllers
                 return BadRequest(new { message = "User not found" });
             }
 
-            //var resetResult = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
-            //if (!resetResult.Succeeded)
-            //{
-            //    return BadRequest(new { message = "Password reset failed", errors = resetResult.Errors });
-            //}
+            var resetResult = await _identityRepo.ResetNewPassword(user, model.Token, model.NewPassword);
+            if (!resetResult.Succeeded)
+            {
+                return BadRequest(new { message = "Password reset failed", errors = resetResult.Errors });
+            }
 
             return Ok(new { message = "Password reset successfully" });
         }
 
 
 
-        //[HttpDelete("Delete_Account")]
-        //[Authorize]
-        //public async Task<IActionResult> DeleteAccount()
-        //{
-        //    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        //    if (userId == null)
-        //        return Unauthorized(new { message = "User is not logged in" });
 
-        //    var user = await _userManager.FindByIdAsync(userId);
+        [HttpDelete("Delete_Account")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        //    if (user == null)
-        //        return NotFound(new { message = "User not found" });
+            if (userId == null)
+                return Unauthorized(new { message = "User is not logged in" });
 
-        //    var roles = await _userManager.GetRolesAsync(user);
-        //    var role = roles.FirstOrDefault();
+            var user = await _identityRepo.GetUserByIdAsync(userId);
 
-        //    if (role == "Doctor")
-        //    {
-        //        var doctor = await context.Doctor.FirstOrDefaultAsync(d => d.Doctor_ID == user.Id);
-        //        if (doctor != null)
-        //        {
-        //            context.Doctor.Remove(doctor);
-        //        }
-        //    }
-        //    else if (role == "Student")
-        //    {
-        //        var student = await context.Student.FirstOrDefaultAsync(s => s.Student_ID == user.Id);
-        //        if (student != null)
-        //        {
-        //            context.Student.Remove(student);
-        //        }
-        //    }
-        //    else if (role == "Admin")
-        //    {
-        //        var admin = await context.Admin.FirstOrDefaultAsync(a => a.Admin_ID == user.Id);
-        //        if (admin != null)
-        //        {
-        //            context.Admin.Remove(admin);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(new { message = "Role not recognized" });
-        //    }
+            if (user == null)
+                return NotFound(new { message = "User not found" });
 
-        //    await context.SaveChangesAsync();
+            var roles = await _identityRepo.GetUserRolesAsync(user);
+            var role = roles.FirstOrDefault();
 
-        //    var result = await _userManager.DeleteAsync(user);
-        //    if (result.Succeeded)
-        //    {
-        //        return Ok(new { message = $"{role} Account Deleted Successfully" });
-        //    }
+            if (role == "Doctor")
+            {
+                var doctor = await userRepositry.GetByIdDoctorAsync(user.Id);
+                if (doctor != null)
+                {
+                    await userRepositry.DeleteDoctor(doctor.Doctor_ID);
+                }
+            }
+            else if (role == "Student")
+            {
+                var student = await userRepositry.GetByIdStudentAsync(user.Id);
+                if (student != null)
+                {
+                    await userRepositry.DeleteStudent(student.Student_ID);
+                }
+            }
+            else if (role == "Admin")
+            {
+                var admin = await userRepositry.GetByIdAdminAsync(user.Id);
+                if (admin != null)
+                {
+                    await userRepositry.DeleteAdmin(admin.Admin_ID);
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "Role not recognized" });
+            }
 
-        //    return BadRequest(result.Errors);
-        //}
+
+            var result = await _identityRepo.DeleteUserByIdAsync(userId);
+            if (result.Succeeded)
+            {
+                return Ok(new { message = $"{role} Account Deleted Successfully" });
+            }
+
+            return BadRequest(result.Errors);
+        }
 
 
     }

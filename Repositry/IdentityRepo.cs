@@ -156,10 +156,32 @@ namespace AIDentify.Repositry
         {
            return await _userManager.GeneratePasswordResetTokenAsync(user);
         }
-        public async Task ResetNewPassword(ApplicationUser user, string token, string NewPassword)
+        public async Task<IdentityResult> ResetNewPassword(ApplicationUser user, string token, string newPassword)
         {
-             await _userManager.ResetPasswordAsync(user, token, NewPassword);
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
+        public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+        public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
+        {
+            return await _userManager.GetRolesAsync(user);
+        }
+        public async Task<IdentityResult> DeleteUserByIdAsync(string userId)
+        {
+            var user = await GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                var error = new IdentityError { Description = "User Not Found " };
+                return IdentityResult.Failed(error);
+            }
+
+            return await _userManager.DeleteAsync(user);
+        }
+
+
 
 
 

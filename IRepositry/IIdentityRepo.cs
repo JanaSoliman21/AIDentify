@@ -1,4 +1,5 @@
 ﻿using AIDentify.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace AIDentify.IRepositry
 {
@@ -11,5 +12,10 @@ namespace AIDentify.IRepositry
         Task<(bool Success, List<string> Errors)> LogoutAsync(string token);
         Task<ApplicationUser?> GetUserByEmailAsync(string email);
         Task<string> GetNewTokenAsync(ApplicationUser user);
+        Task<IdentityResult> ResetNewPassword(ApplicationUser user, string token, string newPassword);
+        Task<ApplicationUser?> GetUserByIdAsync(string userId);
+        Task<IList<string>> GetUserRolesAsync(ApplicationUser user);
+        Task<IdentityResult> DeleteUserByIdAsync(string userId);
+
     }
 }

@@ -29,6 +29,7 @@ namespace AIDentify.Models
 
         [Required]
         [DataType(DataType.Password)]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string Password { get; set; }
 
         public string? SubscriptionId { get; set; }
