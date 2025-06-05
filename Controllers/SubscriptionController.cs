@@ -49,7 +49,13 @@ namespace AIDentify.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            return Ok(SubscriptionRepository.GetSubscription(id));
+            var subscription = SubscriptionRepository.GetSubscription(id);
+            if (subscription == null)
+            {
+                return NotFound("Subscription not found.");
+            }
+
+            return Ok(subscription);
         }
 
         #endregion
@@ -151,7 +157,6 @@ namespace AIDentify.Controllers
                             // Handle the case where the new plan is cheaper
                             hasChange = true;
                             message = "You have " + Math.Abs(priceDifference) + " change.";
-
                         }
                     }
                 }

@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250429164338_MessageEdit1")]
+    partial class MessageEdit1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,6 +143,51 @@ namespace AIDentify.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("AIDentify.Models.Block", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BlockedIdD")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BlockedIdS")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BlockerIdD")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BlockerIdS")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChatId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlockedIdD");
+
+                    b.HasIndex("BlockedIdS");
+
+                    b.HasIndex("BlockerIdD");
+
+                    b.HasIndex("BlockerIdS");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("Block");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Chat", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Chat");
+                });
+
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
                     b.Property<string>("Doctor_ID")
@@ -209,6 +257,51 @@ namespace AIDentify.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("MedicalHistory");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Message", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ChatId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiverIdD")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReceiverIdS")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderIdD")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderIdS")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("ReceiverIdD");
+
+                    b.HasIndex("ReceiverIdS");
+
+                    b.HasIndex("SenderIdD");
+
+                    b.HasIndex("SenderIdS");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
@@ -681,6 +774,41 @@ namespace AIDentify.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AIDentify.Models.Block", b =>
+                {
+                    b.HasOne("AIDentify.Models.Doctor", "BlockedDoctor")
+                        .WithMany()
+                        .HasForeignKey("BlockedIdD")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", "BlockedStudent")
+                        .WithMany()
+                        .HasForeignKey("BlockedIdS")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Doctor", "BlockerDoctor")
+                        .WithMany()
+                        .HasForeignKey("BlockerIdD")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", "BlockerStudent")
+                        .WithMany()
+                        .HasForeignKey("BlockerIdS")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Chat", null)
+                        .WithMany("BlockList")
+                        .HasForeignKey("ChatId");
+
+                    b.Navigation("BlockedDoctor");
+
+                    b.Navigation("BlockedStudent");
+
+                    b.Navigation("BlockerDoctor");
+
+                    b.Navigation("BlockerStudent");
+                });
+
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
                     b.HasOne("AIDentify.Models.Subscription", "Subscription")
@@ -697,6 +825,41 @@ namespace AIDentify.Migrations
                         .HasForeignKey("PatientId");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Message", b =>
+                {
+                    b.HasOne("AIDentify.Models.Chat", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId");
+
+                    b.HasOne("AIDentify.Models.Doctor", "ReceiverDoctor")
+                        .WithMany()
+                        .HasForeignKey("ReceiverIdD")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", "ReceiverStudent")
+                        .WithMany()
+                        .HasForeignKey("ReceiverIdS")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Doctor", "SenderDoctor")
+                        .WithMany()
+                        .HasForeignKey("SenderIdD")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", "SenderStudent")
+                        .WithMany()
+                        .HasForeignKey("SenderIdS")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ReceiverDoctor");
+
+                    b.Navigation("ReceiverStudent");
+
+                    b.Navigation("SenderDoctor");
+
+                    b.Navigation("SenderStudent");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
@@ -878,6 +1041,13 @@ namespace AIDentify.Migrations
             modelBuilder.Entity("AIDentify.Models.Admin", b =>
                 {
                     b.Navigation("SystemUpdates");
+                });
+
+            modelBuilder.Entity("AIDentify.Models.Chat", b =>
+                {
+                    b.Navigation("BlockList");
+
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>

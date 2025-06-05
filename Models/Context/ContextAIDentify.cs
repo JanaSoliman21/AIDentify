@@ -16,31 +16,6 @@ namespace AIDentify.Models.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Message Relationships - Handle Sender & Receiver
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.SenderDoctor)
-                .WithMany()
-                .HasForeignKey(m => m.SenderIdD)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.SenderStudent)
-                .WithMany()
-                .HasForeignKey(m => m.SenderIdS)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.ReceiverDoctor)
-                .WithMany()
-                .HasForeignKey(m => m.ReceiverIdD)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.ReceiverStudent)
-                .WithMany()
-                .HasForeignKey(m => m.ReceiverIdS)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // XRayScan Relationships - Enforce Rules
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Patient)
@@ -156,7 +131,6 @@ namespace AIDentify.Models.Context
         public DbSet<Admin> Admin { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<MedicalHistory> MedicalHistory { get; set; }
-        public DbSet<Message> Message { get; set; }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<Payment> Payment { get; set; }
         public DbSet<Plan> Plan { get; set; }

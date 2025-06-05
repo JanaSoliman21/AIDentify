@@ -6,14 +6,13 @@
         Subscription = 2,
         Doctor = 3,
         Student = 4,
-        Message = 5,
-        Patient = 6,
-        Plan = 7,
-        Question = 8,
-        Quiz = 9,
-        QuizAttempt = 10,
-        SystemUpdate = 11,
-        TrendingNews = 12,
-        XRayScan = 13
+        Patient = 5,
+        Plan = 6,
+        Question = 7,
+        Quiz = 8,
+        QuizAttempt = 9,
+        SystemUpdate = 10,
+        TrendingNews = 11,
+        XRayScan = 12
     }
 }
