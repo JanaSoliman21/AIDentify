@@ -31,7 +31,7 @@ namespace AIDentify
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
+            builder.Services.AddScoped<IIdentityRepo, IdentityRepo>();
             builder.Services.AddScoped<IUserRepositry, UserRepositry>();
             builder.Services.AddScoped<IPlanRepository, PlanRepositry>();
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();

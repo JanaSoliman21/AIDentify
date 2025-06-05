@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-//using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AIDentify.Models
 {
@@ -28,15 +28,19 @@ namespace AIDentify.Models
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
+
+        [System.Text.Json.Serialization.JsonIgnore]
         [Required]
         [DataType(DataType.Password)]
+        
+
         public string Password { get; set; }
 
         public string? SubscriptionId { get; set; }
 
         [ValidateNever]
         [ForeignKey(nameof(SubscriptionId))]
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public Subscription? Subscription { get; set; }
 
         [ValidateNever]

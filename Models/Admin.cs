@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace AIDentify.Models
 {
@@ -29,6 +30,8 @@ namespace AIDentify.Models
 
         [Required]
         [DataType(DataType.Password)]
+        [JsonIgnore]
+
         public string Password { get; set; }
 
         [ValidateNever]
