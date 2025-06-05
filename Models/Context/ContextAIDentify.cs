@@ -127,7 +127,6 @@ namespace AIDentify.Models.Context
         }
 
 
-
         public DbSet<Admin> Admin { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<MedicalHistory> MedicalHistory { get; set; }
@@ -136,16 +135,10 @@ namespace AIDentify.Models.Context
         public DbSet<Plan> Plan { get; set; }
         public DbSet<Question> Question { get; set; }
         public DbSet<Quiz> Quiz { get; set; }
-
         public DbSet<QuizAttempt> QuizAttempt { get; set; }
-
         public DbSet<Student> Student { get; set; }
         public DbSet<Subscription> Subscription { get; set; }
-
         public DbSet<SystemUpdate> SystemUpdate { get; set; }
-
-        public DbSet<TrendingNews> TrendingNews { get; set; }
-
         public DbSet<XRayScan> XRayScan { get; set; }
 
     }
