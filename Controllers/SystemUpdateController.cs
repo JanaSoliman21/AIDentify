@@ -65,15 +65,26 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Delete
-        //[HttpDelete("{id}")]
-        //public IActionResult Delete(string id)
-        //{
-
-        //}
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            var systemUpdate = _systemUpdateRepository.GetSystemUpdate(id);
+            if (systemUpdate != null)
+            {
+                 _systemUpdateRepository.DeleteSystemUpdate(systemUpdate);
+                return Ok("Deleted Successfully");
+            }
+            return BadRequest("System Update Doesn't Exist");
+        }
         #endregion
 
         #region Delete All for this Admin
-
+        [HttpDelete("all/{adminId}")]
+        public IActionResult DeleteAll(string adminId)
+        {
+            _systemUpdateRepository.DeleteAllSystemUpdateForThisAdmin(adminId);
+            return Ok("All Deleted Successfully");
+        }
         #endregion
     }
 }

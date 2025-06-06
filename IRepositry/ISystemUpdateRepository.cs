@@ -9,7 +9,7 @@ namespace AIDentify.IRepositry
         List<SystemUpdate> GetAllSystemUpdateByAdminId(string adminId);
         void AddSystemUpdate(string adminId, SystemUpdate systemUpdate);
         void UpdateSystemUpdate(SystemUpdate systemUpdate);
-        bool DeleteSystemUpdate(SystemUpdate systemUpdate);
-        bool DeleteAllSystemUpdateForThisAdmin(string adminId);
+        void DeleteSystemUpdate(SystemUpdate systemUpdate);
+        void DeleteAllSystemUpdateForThisAdmin(string adminId);
     }
 }

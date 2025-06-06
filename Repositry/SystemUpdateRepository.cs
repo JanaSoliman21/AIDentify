@@ -15,7 +15,7 @@ namespace AIDentify.Repositry
         }
 
         #region Get All
-        public List<SystemUpdate> GetAllSystemUpdates() 
+        public List<SystemUpdate> GetAllSystemUpdates()
         {
             return _contextAIDentify.SystemUpdate.Include(s => s.Admin).ToList();
         }
@@ -60,19 +60,32 @@ namespace AIDentify.Repositry
         #endregion
 
         #region Delete
-        public bool DeleteSystemUpdate(SystemUpdate systemUpdate)
+        public void DeleteSystemUpdate(SystemUpdate systemUpdate)
         {
-            _contextAIDentify.SystemUpdate.Remove(systemUpdate);
-            return true;
+            var admin = _contextAIDentify.Admin.Where(a => a.Admin_ID == systemUpdate.AdminId).FirstOrDefault();
+            if (admin != null)
+            {
+                _contextAIDentify.SystemUpdate.Remove(systemUpdate);
+                admin.SystemUpdates.Remove(systemUpdate);
+                _contextAIDentify.SaveChanges();
+            }
         }
         #endregion
 
         #region Delete All For this Admin
-        public bool DeleteAllSystemUpdateForThisAdmin(string adminId)
+        public void DeleteAllSystemUpdateForThisAdmin(string adminId)
         {
-            var systemUpdates = _contextAIDentify.SystemUpdate.Where(s => s.AdminId == adminId).ToList();
-            systemUpdates.RemoveRange(0, systemUpdates.Count);
-            return true;
+            var admin = _contextAIDentify.Admin.Where(a => a.Admin_ID == adminId).FirstOrDefault();
+            if (admin != null)
+            {
+                var systemUpdates = _contextAIDentify.SystemUpdate.Where(s => s.AdminId == adminId).ToList();
+                foreach (var systemUpdate in systemUpdates)
+                {
+                    admin.SystemUpdates.Remove(systemUpdate);
+                    _contextAIDentify.SystemUpdate.Remove(systemUpdate);
+                }
+                _contextAIDentify.SaveChanges();
+            }
         }
         #endregion
     }

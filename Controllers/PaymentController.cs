@@ -2,7 +2,9 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using AIDentify.Repositry;
 using Microsoft.AspNetCore.Mvc;
+using System.Numerics;
 
 namespace AIDentify.Controllers
 {
@@ -12,14 +14,17 @@ namespace AIDentify.Controllers
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly ISubscriptionRepository _subscriptionRepository;
+        private readonly ISystemUpdateRepository _systemUpdateRepository;
         private readonly IdGenerator _idGenerator;
+        private UpdateType updateTypePayment = UpdateType.Payment;
 
 
-        public PaymentController(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, IdGenerator idGenerator)
+        public PaymentController(IPaymentRepository paymentRepository, ISubscriptionRepository subscriptionRepository, IdGenerator idGenerator, ISystemUpdateRepository systemUpdateRepository)
         {
             _paymentRepository = paymentRepository;
             _subscriptionRepository = subscriptionRepository;
             _idGenerator = idGenerator;
+            _systemUpdateRepository = systemUpdateRepository;
         }
 
         #region Get All Payments for this User
@@ -227,9 +232,11 @@ namespace AIDentify.Controllers
 
         #region Admin approves or rejects a payment
         
-        [HttpPut("update-status/{paymentId}")]
-        public IActionResult UpdatePaymentStatus(string paymentId, [FromBody] string status)
+        [HttpPut("update-status/{adminId}/{paymentId}")]
+        public IActionResult UpdatePaymentStatus(string adminId, string paymentId, [FromBody] string status)
         {
+            //checking admin ...
+
             if (string.IsNullOrEmpty(status))
             {
                 return BadRequest("You have to enter a status.");
@@ -237,6 +244,16 @@ namespace AIDentify.Controllers
 
             if (Enum.TryParse(status, true, out PaymentStatues parsedStatus))
             {
+                SystemUpdate systemUpdate = new SystemUpdate
+                {
+                    Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
+                    UpdatedDescribtion = "Payment: " + paymentId + " was updated to be " + parsedStatus,
+                    UpdateType = updateTypePayment,
+                    AdminId = adminId
+                };
+
+                _systemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);
+
                 _paymentRepository.UpdateStatus(paymentId, parsedStatus);
                 return Ok($"Payment {paymentId} updated to {parsedStatus}");
             }
