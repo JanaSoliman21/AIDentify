@@ -2,8 +2,9 @@
 {
     public enum UpdateType
     {
+        None,
         User,
         Plan,
-        Model 
+        Payment 
     }
 }

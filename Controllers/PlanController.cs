@@ -1,6 +1,7 @@
 ﻿using AIDentify.ID_Generator;
 using AIDentify.IRepositry;
 using AIDentify.Models;
+using AIDentify.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,16 +10,19 @@ namespace AIDentify.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize(Roles ="Admin")]
-    public class PlanController: ControllerBase
+    public class PlanController : ControllerBase
     {
         private readonly IPlanRepository PlanRepository;
+        private readonly ISystemUpdateRepository SystemUpdateRepository;    //here
         private readonly IdGenerator _idGenerator;
+        private UpdateType updateTypePlan = UpdateType.Plan;    //here
 
-        public PlanController(IPlanRepository planRepository, IdGenerator idGenerator)
+        public PlanController(IPlanRepository planRepository, IdGenerator idGenerator, ISystemUpdateRepository systemUpdateRepository)
         {
             PlanRepository = planRepository;
             _idGenerator = idGenerator;
-        }
+            SystemUpdateRepository = systemUpdateRepository;
+        }   //here
 
         #region Get All
 
@@ -42,9 +46,12 @@ namespace AIDentify.Controllers
 
         #region Add New Plan
 
-        [HttpPost]
-        public IActionResult Add([FromBody] Plan plan)
+        [HttpPost("{adminId}")] //here
+        public IActionResult Add(string adminId, [FromBody] Plan plan) //here
         {
+            //make sure the admin exists
+            // to be done later
+
             plan.Id = _idGenerator.GenerateId<Plan>(ModelPrefix.Plan);
 
             if(plan.PlanName == string.Empty)
@@ -68,7 +75,16 @@ namespace AIDentify.Controllers
                 return BadRequest("Price cannot be empty.");
             }
 
+            SystemUpdate systemUpdate = new SystemUpdate {
+                Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
+                UpdatedDescribtion = "Plan: " + plan.PlanName + " was added, with price of " + plan.Price.ToString(),
+                UpdateType = updateTypePlan,
+                AdminId = adminId
+            };  //here
+
+            SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);  //here
             PlanRepository.Add(plan);
+
             return Ok("Posted Successfully");
         }
 
@@ -76,9 +92,11 @@ namespace AIDentify.Controllers
 
         #region Update Plan
 
-        [HttpPut("{id}")]
-        public IActionResult Update(string id, [FromBody] Plan plan)
+        [HttpPut("{adminId}/{id}")]     //here
+        public IActionResult Update(string adminId, string id, [FromBody] Plan plan)    //here
         {
+            //checking admin ...
+
             plan.Id = id;
 
             var existingPlan = PlanRepository.Get(id);
@@ -109,6 +127,16 @@ namespace AIDentify.Controllers
                 plan.Price = existingPlan.Price;
             }
 
+            SystemUpdate systemUpdate = new SystemUpdate
+            {
+                Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
+                UpdatedDescribtion = "Plan: " + plan.PlanName + " was updated",
+                UpdateType = updateTypePlan,
+                AdminId = adminId
+            };  //here
+
+            SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);  //here
+
             // Update the plan in the repository
             existingPlan = plan;
 
@@ -121,14 +149,27 @@ namespace AIDentify.Controllers
 
         #region Delete Plan
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        [HttpDelete("{adminId}/{id}")]      //here
+        public IActionResult Delete(string adminId, string id)      //here
         {
+            //checking admin ...
+
             Plan? plan = PlanRepository.Get(id);
             if(plan != null)
             {
                 if (PlanRepository.Deleteable(id))
                 {
+                    SystemUpdate systemUpdate = new SystemUpdate
+                    {
+                        Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
+                        UpdatedDescribtion = "Plan: " + plan.PlanName + " was deleted",
+                        UpdateType = updateTypePlan,
+                        AdminId = adminId
+                    };  //here
+
+                    SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);  //here
+
+
                     PlanRepository.Delete(plan);
                     return Ok("Deleted Successfully");
                 }

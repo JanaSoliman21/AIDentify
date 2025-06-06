@@ -10,14 +10,14 @@ namespace AIDentify.Models
     public class SystemUpdate
     {
         [Key]
-        public string SystemUpdateId { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string UpdatedDescribtion { get; set; }
+        public string UpdatedDescribtion { get; set; } = string.Empty;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
-        public UpdateType UpdateType { get; set; }
+        public UpdateType UpdateType { get; set; } = UpdateType.None;
 
         public string? AdminId { get; set; }
 

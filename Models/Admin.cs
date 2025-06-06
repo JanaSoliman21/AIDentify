@@ -35,6 +35,6 @@ namespace AIDentify.Models
         public string Password { get; set; }
 
         [ValidateNever]
-        public List<SystemUpdate> SystemUpdates { get; set; }
+        public List<SystemUpdate> SystemUpdates { get; set; } = new List<SystemUpdate>();
     }
 }
