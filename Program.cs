@@ -40,6 +40,7 @@ namespace AIDentify
             builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
             builder.Services.AddScoped<ISystemUpdateRepository, SystemUpdateRepository>();
+            builder.Services.AddScoped<IXRayScanRepository, XRayScanRepository>();
             builder.Services.AddScoped<IdGenerator>();
             builder.Services.AddHostedService<SubscriptionExpirationService>();
             builder.Services.AddHostedService<SubscriptionFilteringService>();

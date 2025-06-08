@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace AIDentify.Models
 {
     public class Patient
     {
         [Key]
-        public string PatientId { get; set; }
+        public string Id { get; set; }
 
         [Required]
         public string PatientName { get; set; }
@@ -23,10 +24,16 @@ namespace AIDentify.Models
 
         [ValidateNever]
         [ForeignKey(nameof(DoctorId))]
+        [JsonIgnore]
         public Doctor? Doctor { get; set; }
 
+        public String DoctorName { get; set; }
+
         [ValidateNever]
-        public List<MedicalHistory> MedicalHistories { get; set; }
+        public String? TeethPrediction { get; set; }
+
+        [ValidateNever]
+        public ICollection<MedicalHistory> MedicalHistories { get; set; }
 
     }
 }

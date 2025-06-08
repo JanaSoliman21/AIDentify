@@ -162,9 +162,6 @@ namespace AIDentify.Controllers
         }
 
 
-
-
-
         [HttpDelete("Delete_Account")]
         [Authorize]
         public async Task<IActionResult> DeleteAccount()
