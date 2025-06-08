@@ -29,8 +29,6 @@ namespace AIDentify.Models
 
         public String DoctorName { get; set; }
 
-        [ValidateNever]
-        public String? TeethPrediction { get; set; }
 
         [ValidateNever]
         public ICollection<MedicalHistory> MedicalHistories { get; set; }

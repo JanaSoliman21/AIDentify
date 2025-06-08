@@ -21,8 +21,16 @@ namespace AIDentify
             // Add services to the container.
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
+                // ✅ منع الدورات المرجعية بدون Preserve
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+                // ✅ تمثيل Enums كنص
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+                // ✅ تجاهل القيم التي تساوي null
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
+
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -41,6 +49,8 @@ namespace AIDentify
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
             builder.Services.AddScoped<ISystemUpdateRepository, SystemUpdateRepository>();
             builder.Services.AddScoped<IXRayScanRepository, XRayScanRepository>();
+            builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+            builder.Services.AddScoped<IMedicalHistoryRepository, MedicalHistoryRepository>();
             builder.Services.AddScoped<IdGenerator>();
             builder.Services.AddHostedService<SubscriptionExpirationService>();
             builder.Services.AddHostedService<SubscriptionFilteringService>();
@@ -57,6 +67,8 @@ namespace AIDentify
                 });
 
             builder.Services.AddCustomJwtAuth(builder.Configuration);
+           
+
 
             // ✅ Add CORS policy
             builder.Services.AddCors(options =>

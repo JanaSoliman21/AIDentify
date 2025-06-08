@@ -34,6 +34,6 @@ namespace AIDentify.Models
         public String? TeethPrediction { get; set; }
 
         [ValidateNever]
-        public DateTime VisitDate { get; set; }
+        public DateTime VisitDate { get; set; } = DateTime.Now;
     }
 }
