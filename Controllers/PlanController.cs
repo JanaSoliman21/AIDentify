@@ -105,6 +105,28 @@ namespace AIDentify.Controllers
                 return NotFound("Plan not found.");
             }
 
+            List<Subscription> subscriptions = PlanRepository.GetSubscriptions(existingPlan);
+            if (subscriptions.Count > 0)
+            {
+                Plan planTemp = new Plan
+                {
+                    Id = existingPlan.Id + "-Temp",
+                    PlanName = existingPlan.PlanName,
+                    Duration = existingPlan.Duration,
+                    MaxScans = existingPlan.MaxScans,
+                    MaxPatients = existingPlan.MaxPatients,
+                    Price = existingPlan.Price
+                };
+
+                PlanRepository.Add(planTemp);
+
+                foreach(var subscription in subscriptions)
+                {
+                    subscription.PlanId = planTemp.Id;
+                }
+            }
+
+
             // Update the old plan with the new values
             if (plan.PlanName == string.Empty)
             {

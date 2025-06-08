@@ -28,6 +28,11 @@ namespace AIDentify.Repositry
             _context.SaveChanges();
         }
 
+        public List<Subscription> GetSubscriptions(Plan plan)
+        {
+            return _context.Subscription.Where(s => s.Plan == plan).ToList();
+        }
+
         public void Update(Plan plan)
         {
             var existingPlan = _context.Plan.Find(plan.Id);
