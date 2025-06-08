@@ -8,9 +8,9 @@ namespace AIDentify.IRepositry
         List<Plan> GetAll();
         Plan? Get(string id);
         void Add(Plan Plan);
+        List<Subscription> GetSubscriptions(Plan plan);
         void Update(Plan plan);
         void Delete(Plan Plan);
-
         bool Deleteable(string id);
         bool PlanExists(string id);
 

@@ -3,6 +3,7 @@ using AIDentify.Models.Enums;
 
 namespace AIDentify.Service
 {
+    using AIDentify.Models;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using System;
@@ -29,8 +30,12 @@ namespace AIDentify.Service
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
 
-                        var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
+                        //var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
+                        var affectedSubscriptions = dbContext.Subscription.Where(s => s.PlanId.EndsWith("Temp")).Include(s => s.Plan).ToList();
+                        var tempPlans = dbContext.Plan.Where(p => p.Id.EndsWith("Temp")).ToList();
 
+                        #region Commented
+                        #region Maybe Important
                         //var expiredSubscriptions = dbContext.Subscription
                         //.Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
                         //.ToList();
@@ -43,30 +48,73 @@ namespace AIDentify.Service
                         //        //subscription.IsPaid = false; // Assuming you want to set IsPaid to false when expired
                         //    }
                         //}
+                        #endregion
 
-                        foreach (var subscription in subscriptions)
+                        //List<Subscription> affectedSubscriptions = new List<Subscription>();
+                        //foreach (var subscription in subscriptions)
+                        //{
+                        //    if (subscription.StartDate == default || subscription.Plan == null)
+                        //        continue;
+
+                        //    if (subscription.PlanId.EndsWith("Temp"))
+                        //    {
+                        //        Console.WriteLine("Found!");
+                        //        affectedSubscriptions.Add(subscription);
+                        //    }
+
+                        #region Here
+                        //int duration = subscription.Plan.Duration;
+                        //DateTime newEndDate, warningDate;
+                        //DateTime startDate = subscription.StartDate;
+
+                        //if (duration < 12)
+                        //{
+                        //    newEndDate = startDate.AddMonths(duration);
+                        //}
+                        //else
+                        //{
+                        //    int years = duration / 12;
+                        //    int months = duration % 12;
+                        //    newEndDate = startDate.AddYears(years).AddMonths(months);
+                        //}
+
+                        //warningDate = newEndDate.AddDays(-7);
+                        //subscription.EndDate = newEndDate;
+                        //subscription.WarningDate = warningDate;
+                        #endregion
+                        //}
+                        #endregion
+
+                        foreach (var subscription in affectedSubscriptions)
                         {
-                            if (subscription.StartDate == default || subscription.Plan == null)
-                                continue;
-
-                            int duration = subscription.Plan.Duration;
-                            DateTime newEndDate, warningDate;
-                            DateTime startDate = subscription.StartDate;
-
-                            if (duration < 12)
+                            if (subscription.WarningDate == DateTime.Now.Date)
                             {
-                                newEndDate = startDate.AddMonths(duration);
-                            }
-                            else
-                            {
-                                int years = duration / 12;
-                                int months = duration % 12;
-                                newEndDate = startDate.AddYears(years).AddMonths(months);
+                                Console.WriteLine("The plan u subscriped for has been updated or no longer exists!" +
+                                    "U need to choose one of the currently offered plans at the end of your subscription!");
                             }
 
-                            warningDate = newEndDate.AddDays(-7);
-                            subscription.EndDate = newEndDate;
-                            subscription.WarningDate = warningDate;
+                            if (subscription.EndDate <= DateTime.Now)
+                            {
+                                Console.WriteLine("Your subscription has ended!" +
+                                    "U need to choose one of the currently offered plans!");
+                                if (subscription.IsPaid == true)
+                                {
+                                    long moneyBack = subscription.Plan.Price;
+                                    Console.WriteLine("Here is your money back: " + moneyBack.ToString());
+                                    subscription.IsPaid = false;
+                                }
+
+                                subscription.PlanId = null;
+                            }
+                        }
+
+                        foreach (var tempPlan in tempPlans)
+                        {
+                            var connectedSubscriptions = dbContext.Subscription.Where(s => s.Plan ==  tempPlan).ToList();
+                            if (connectedSubscriptions.Count == 0)
+                            {
+                                dbContext.Remove(tempPlan);
+                            }
                         }
 
                         //await dbContext.SaveChangesAsync();
@@ -75,7 +123,7 @@ namespace AIDentify.Service
 
 
                     // Wait for a set interval before running again
-                    await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken); // Runs every hour
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); // Runs every hour
                 }
             }
             catch (TaskCanceledException)
