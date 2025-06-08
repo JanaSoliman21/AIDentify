@@ -56,6 +56,19 @@ namespace AIDentify.Models.Context
                 .HasForeignKey<Subscription>(s => s.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Notification Relationship Fix
+            modelBuilder.Entity<Notification>()
+                .HasOne(s => s.Doctor)
+                .WithOne()
+                .HasForeignKey<Notification>(s => s.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(s => s.Student)
+                .WithOne()
+                .HasForeignKey<Notification>(s => s.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Payment Relationship Fix
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Doctor)
@@ -102,6 +115,16 @@ namespace AIDentify.Models.Context
                     }
                 }
 
+                foreach (var entry in ChangeTracker.Entries<Notification>())
+                {
+                    var sub = entry.Entity;
+
+                    if (!string.IsNullOrEmpty(sub.DoctorId) && !string.IsNullOrEmpty(sub.StudentId))
+                    {
+                        throw new Exception("A Notification must belong to either a Doctor or a Student, not both.");
+                    }
+                }
+
                 foreach (var entry in ChangeTracker.Entries<Payment>())
                 {
                     var payment = entry.Entity;
@@ -135,6 +158,7 @@ namespace AIDentify.Models.Context
         public DbSet<Subscription> Subscription { get; set; }
         public DbSet<SystemUpdate> SystemUpdate { get; set; }
         public DbSet<XRayScan> XRayScan { get; set; }
+        public DbSet<Notification> Notification { get; set; }
 
     }
 }

@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250608203859_SystemUpdate3")]
+    partial class SystemUpdate3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,47 +216,6 @@ namespace AIDentify.Migrations
                     b.HasIndex("XRayScanId");
 
                     b.ToTable("MedicalHistory");
-                });
-
-            modelBuilder.Entity("AIDentify.Models.Notification", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Doctor_ID")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("NotificationContent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StudentId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Student_ID")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DoctorId")
-                        .IsUnique()
-                        .HasFilter("[DoctorId] IS NOT NULL");
-
-                    b.HasIndex("Doctor_ID");
-
-                    b.HasIndex("StudentId")
-                        .IsUnique()
-                        .HasFilter("[StudentId] IS NOT NULL");
-
-                    b.HasIndex("Student_ID");
-
-                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
@@ -728,31 +690,6 @@ namespace AIDentify.Migrations
                     b.Navigation("XRayScan");
                 });
 
-            modelBuilder.Entity("AIDentify.Models.Notification", b =>
-                {
-                    b.HasOne("AIDentify.Models.Doctor", "Doctor")
-                        .WithOne()
-                        .HasForeignKey("AIDentify.Models.Notification", "DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AIDentify.Models.Doctor", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("Doctor_ID");
-
-                    b.HasOne("AIDentify.Models.Student", "Student")
-                        .WithOne()
-                        .HasForeignKey("AIDentify.Models.Notification", "StudentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AIDentify.Models.Student", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("Student_ID");
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("AIDentify.Models.Patient", b =>
                 {
                     b.HasOne("AIDentify.Models.Doctor", "Doctor")
@@ -929,8 +866,6 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Doctor", b =>
                 {
-                    b.Navigation("Notifications");
-
                     b.Navigation("Payments");
 
                     b.Navigation("patients");
@@ -950,8 +885,6 @@ namespace AIDentify.Migrations
 
             modelBuilder.Entity("AIDentify.Models.Student", b =>
                 {
-                    b.Navigation("Notifications");
-
                     b.Navigation("Payments");
 
                     b.Navigation("QuizAttempts");

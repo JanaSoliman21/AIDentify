@@ -56,5 +56,8 @@ namespace AIDentify.Models
 
         [ValidateNever]
         public List<QuizAttempt>? QuizAttempts { get; set; } = new();
+
+        [ValidateNever]
+        public List<Notification> Notifications { get; set; } = new();
     }
 }

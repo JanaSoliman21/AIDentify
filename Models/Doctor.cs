@@ -47,5 +47,8 @@ namespace AIDentify.Models
 
         [ValidateNever]
         public List<Patient>? patients { get; set; }
+
+        [ValidateNever]
+        public List<Notification> Notifications { get; set; } = new();
     }
 }
