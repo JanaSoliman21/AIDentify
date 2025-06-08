@@ -17,11 +17,6 @@ namespace AIDentify.Models.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // XRayScan Relationships - Enforce Rules
-            modelBuilder.Entity<XRayScan>()
-                .HasOne(x => x.Patient)
-                .WithMany()
-                .HasForeignKey(x => x.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Doctor)
@@ -86,12 +81,12 @@ namespace AIDentify.Models.Context
                 {
                     var scan = entry.Entity;
 
-                    if (!string.IsNullOrEmpty(scan.DoctorId) && string.IsNullOrEmpty(scan.PatientId))
+                    if (!string.IsNullOrEmpty(scan.DoctorId))
                     {
                         throw new Exception("If DoctorId is provided, PatientId must be provided too.");
                     }
 
-                    if (!string.IsNullOrEmpty(scan.StudentId) && (!string.IsNullOrEmpty(scan.DoctorId) || !string.IsNullOrEmpty(scan.PatientId)))
+                    if (!string.IsNullOrEmpty(scan.StudentId) && (!string.IsNullOrEmpty(scan.DoctorId)))
                     {
                         throw new Exception("Student scans must not have DoctorId or PatientId.");
                     }

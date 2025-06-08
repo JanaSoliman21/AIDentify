@@ -8,13 +8,7 @@ namespace AIDentify.Models
     public class XRayScan
     {
         [Key]
-        public string ScanId { get; set; }
-
-        public string? PatientId { get; set; }
-
-        [ValidateNever]
-        [ForeignKey(nameof(PatientId))]
-        public Patient? Patient { get; set; }
+        public string Id { get; set; }
 
         public string? DoctorId { get; set; }
 
@@ -46,5 +40,8 @@ namespace AIDentify.Models
 
         [Required]
         public DateTime ScanDate { get; set; }
+
+        [ValidateNever]
+        public ICollection<MedicalHistory>? MedicalHistories { get; set; }
     }
 }
