@@ -5,6 +5,7 @@ namespace AIDentify.Service
 {
     using AIDentify.ID_Generator;
     using AIDentify.IRepositry;
+    using AIDentify.Migrations;
     using AIDentify.Models;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
@@ -35,6 +36,7 @@ namespace AIDentify.Service
 
                         //var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
                         var affectedSubscriptions = dbContext.Subscription.Where(s => s.PlanId.EndsWith("Temp")).Include(s => s.Plan).ToList();
+                        var subscriptionWithoutPlan = dbContext.Subscription.Where(s => s.Plan == null).ToList();
                         var tempPlans = dbContext.Plan.Where(p => p.Id.EndsWith("Temp")).ToList();
 
                         #region Commented
@@ -92,9 +94,6 @@ namespace AIDentify.Service
                         {
                             if (subscription.WarningDate == DateTime.Now.Date)
                             {
-                                //Console.WriteLine("The plan u subscriped for has been updated or no longer exists!" +
-                                //    "U need to choose one of the currently offered plans at the end of your subscription!");
-
                                 string warningMessage = "The plan you subscribed to has been updated or no longer exists! " +
                                     "You need to choose one of the currently offered plans at the end of your subscription!";
 
@@ -111,8 +110,6 @@ namespace AIDentify.Service
 
                             if (subscription.EndDate <= DateTime.Now)
                             {
-                                //Console.WriteLine("Your subscription has ended!" +
-                                //    "U need to choose one of the currently offered plans!");
                                 string endWarningMessage = "Your subscription has ended! " +
                                     "You need to choose one of the currently offered plans!";
                                 Notification notification = new Notification
@@ -129,7 +126,6 @@ namespace AIDentify.Service
                                 {
                                     long moneyBack = subscription.Plan.Price;
                                     
-                                    //Console.WriteLine("Here is your money back: " + moneyBack.ToString());
                                     string moneyMessage = "Here is your money back: " + moneyBack.ToString();
                                     notification = new Notification
                                     {
@@ -148,6 +144,14 @@ namespace AIDentify.Service
                             }
                         }
 
+                        foreach (var subscription in subscriptionWithoutPlan)
+                        {
+                            if (subscription.IsPaid == true)
+                            {
+                                subscription.IsPaid = false;
+                            }
+                        }
+
                         foreach (var tempPlan in tempPlans)
                         {
                             var connectedSubscriptions = dbContext.Subscription.Where(s => s.Plan ==  tempPlan).ToList();
@@ -157,12 +161,9 @@ namespace AIDentify.Service
                             }
                         }
 
-
-
                         //await dbContext.SaveChangesAsync();
                         await dbContext.SaveChangesAsync();
                     }
-
 
                     // Wait for a set interval before running again
                     await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken); // Runs every hour

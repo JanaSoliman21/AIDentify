@@ -18,13 +18,15 @@ namespace AIDentify.Controllers
             _idGenerator = idGenerator;
         }
 
-
+        #region Get All Notifications
         [HttpGet]
         public ActionResult<List<Notification?>> GetAllNotifications()
         {
             return Ok(_notificationRepository.GetAllNotifications());
         }
+        #endregion
 
+        #region Get Notifications by User Id
         [HttpGet("{userId}")]
         public ActionResult<List<Notification?>> GetNotificationsByUserId(string userId)
         {
@@ -33,8 +35,10 @@ namespace AIDentify.Controllers
                 return BadRequest("User ID cannot be null or empty.");
             }
             return Ok(_notificationRepository.GetNotificationsByUserId(userId));
-        }       // here
+        }
+        #endregion
 
+        #region Get Notification by Id
         [HttpGet("notification/{id}")]
         public ActionResult<Notification?> GetNotification(string id)
         {
@@ -45,7 +49,9 @@ namespace AIDentify.Controllers
             }
             return Ok(notification);
         }
+        #endregion
 
+        #region Add Notification
         [HttpPost("{userId}")]
         public ActionResult AddNotification([FromBody] string notificationContent, string userId)
         {
@@ -59,7 +65,23 @@ namespace AIDentify.Controllers
             _notificationRepository.AddNotification(notification, userId);
             return Ok("Created Successfully");
         }
+        #endregion
 
+        #region Mark Notification as Seen
+        [HttpPut("seen/{id}")]
+        public ActionResult MarkNotificationAsSeen(string id)
+        {
+            var notification = _notificationRepository.GetNotification(id);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+            _notificationRepository.MarkAsSeen(id);
+            return Ok("Marked as Seen Successfully");
+        }
+        #endregion
+
+        #region Update Notification
         [HttpPut("{id}")]
         public ActionResult UpdateNotification([FromBody] string notificationNewContent, string id)
         {
@@ -71,7 +93,9 @@ namespace AIDentify.Controllers
             _notificationRepository.UpdateNotification(notification);
             return Ok("Updated Successfully");
         }
+        #endregion
 
+        #region Delete Notification by Id
         [HttpDelete("{id}")]
         public ActionResult DeleteNotification(string id)
         {
@@ -83,12 +107,15 @@ namespace AIDentify.Controllers
             _notificationRepository.DeleteNotification(notification);
             return Ok("Deleted Successfully");
         }
+        #endregion
 
+        #region Delete All Notifications for a User
         [HttpDelete("user/{userId}")]
         public ActionResult DeleteAllNotificationsByUserId(string userId)
         {
             _notificationRepository.DeleteAllNotificationsByUserId(userId);
             return Ok("All Deleted Successfully");
         }
+        #endregion
     }
 }

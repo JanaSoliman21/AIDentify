@@ -1,5 +1,6 @@
 ﻿using AIDentify.IRepositry;
 using AIDentify.Models;
+using AIDentify.Models.Enums;
 using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,11 +15,14 @@ namespace AIDentify.Repositry
             _context = context;
         }
 
+        #region Get All Notifications
         public List<Notification?> GetAllNotifications()
         {
             return _context.Notification.Include(n => n.Doctor).Include(n => n.Student).ToList();
         }
+        #endregion
 
+        #region Get Notifications by User Id
         public List<Notification?> GetNotificationsByUserId(string userId)
         {
             return _context.Notification
@@ -27,7 +31,9 @@ namespace AIDentify.Repositry
                 .Include(n => n.Student)
                 .ToList();
         }
+        #endregion
 
+        #region Get Notification by Id
         public Notification? GetNotification(string id)
         {
             return _context.Notification
@@ -35,7 +41,9 @@ namespace AIDentify.Repositry
                 .Include(n => n.Student)
                 .FirstOrDefault(n => n.Id == id);
         }
+        #endregion
 
+        #region Add Notification
         public void AddNotification(Notification notification, string userId)
         {
             var doctor = _context.Doctor.FirstOrDefault(d => d.Doctor_ID == userId);
@@ -58,7 +66,21 @@ namespace AIDentify.Repositry
             _context.Notification.Add(notification);
             _context.SaveChanges();
         }
+        #endregion
 
+        #region Mark Notification as Seen
+        public void MarkAsSeen(string notificationId)
+        {
+            var notification = _context.Notification.FirstOrDefault(n => n.Id == notificationId);
+            if (notification != null)
+            {
+                notification.Status = NotificationStatus.seen;
+                _context.SaveChanges();
+            }
+        }
+        #endregion
+
+        #region Update Notification
         public void UpdateNotification(Notification notification)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
@@ -75,14 +97,18 @@ namespace AIDentify.Repositry
                 _context.SaveChanges();
             }
         }
+        #endregion
 
+        #region Delete Notification
         public void DeleteNotification(Notification notification)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
             _context.Notification.Remove(notification);
             _context.SaveChanges();
         }
+        #endregion
 
+        #region Delete All Notifications for a User
         public void DeleteAllNotificationsByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId)) throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
@@ -95,5 +121,6 @@ namespace AIDentify.Repositry
                 _context.SaveChanges();
             }
         }
+        #endregion
     }
 }

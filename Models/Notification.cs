@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -16,6 +17,9 @@ namespace AIDentify.Models
         [ValidateNever]
         public DateTime SentAt { get; set; }
 
+        [ValidateNever]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public NotificationStatus Status { get; set; } = NotificationStatus.sent;
 
         // Either a Doctor or a Student get notifications
         public string? DoctorId { get; set; }

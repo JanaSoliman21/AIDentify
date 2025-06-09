@@ -334,6 +334,11 @@ namespace AIDentify.Controllers
                 return BadRequest("Subscription is already paid.");
             }
 
+            if (subscription.PlanId.EndsWith("Temp"))
+            {
+                return BadRequest("You have to choose another plan, because you currently are using a temporary plan.");
+            }
+
             //// create a new payment
             // set the payment id
             payment.Id = _idGenerator.GenerateId<Payment>(ModelPrefix.Payment);
