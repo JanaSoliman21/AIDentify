@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace AIDentify.Models
 {
     public class Notification
     {
         [Key]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [Required]
-        public string NotificationContent { get; set; }
+        public string NotificationContent { get; set; } = string.Empty;
 
         [ValidateNever]
         public DateTime SentAt { get; set; }
@@ -20,13 +21,13 @@ namespace AIDentify.Models
         public string? DoctorId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(DoctorId))]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Doctor? Doctor { get; set; }
 
         public string? StudentId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(StudentId))]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Student? Student { get; set; }
     }
 }

@@ -12,7 +12,7 @@
         Quiz = 8,
         QuizAttempt = 9,
         SystemUpdate = 10,
-        TrendingNews = 11,
+        Notification = 11,
         XRayScan = 12,
         MedicalHistory = 13
     }

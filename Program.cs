@@ -51,10 +51,11 @@ namespace AIDentify
             builder.Services.AddScoped<IXRayScanRepository, XRayScanRepository>();
             builder.Services.AddScoped<IPatientRepository, PatientRepository>();
             builder.Services.AddScoped<IMedicalHistoryRepository, MedicalHistoryRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<IdGenerator>();
-            builder.Services.AddHostedService<SubscriptionExpirationService>();
-            builder.Services.AddHostedService<SubscriptionFilteringService>();
-            builder.Services.AddHostedService<PlanUpdatingService>();
+            //builder.Services.AddHostedService<SubscriptionExpirationService>();
+            //builder.Services.AddHostedService<SubscriptionFilteringService>();
+            //builder.Services.AddHostedService<PlanUpdatingService>();
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;

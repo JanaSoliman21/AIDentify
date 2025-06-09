@@ -3,6 +3,8 @@ using AIDentify.Models.Enums;
 
 namespace AIDentify.Service
 {
+    using AIDentify.ID_Generator;
+    using AIDentify.Models;
     using Microsoft.Extensions.Hosting;
     using System;
     using System.Linq;
@@ -27,7 +29,7 @@ namespace AIDentify.Service
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
-
+                        var _idGenerator = scope.ServiceProvider.GetRequiredService<IdGenerator>();
 
                         // Get subscriptions that need to be updated
                         var subscriptions = dbContext.Subscription.ToList();
@@ -45,6 +47,18 @@ namespace AIDentify.Service
                                 foreach (var subscription in expiredSubscriptions)
                                 {
                                     subscription.Status = SubscriptionStatus.Expired;
+
+                                    string endWarningMessage = "Your subscription has ended! " +
+                                    "You need to renew your subscription or to choose one of the currently offered plans!";
+                                    Notification notification = new Notification
+                                    {
+                                        Id = _idGenerator.GenerateId<Notification>(ModelPrefix.Notification),
+                                        NotificationContent = endWarningMessage,
+                                        SentAt = DateTime.UtcNow,
+                                        DoctorId = subscription.DoctorId,
+                                        StudentId = subscription.StudentId
+                                    };
+                                    dbContext.Notification.Add(notification);
                                 }
                             }
                             

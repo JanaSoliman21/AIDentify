@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250609132629_Notification2")]
+    partial class Notification2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,6 +226,9 @@ namespace AIDentify.Migrations
                     b.Property<string>("DoctorId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Doctor_ID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("NotificationContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -233,11 +239,22 @@ namespace AIDentify.Migrations
                     b.Property<string>("StudentId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Student_ID")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId");
+                    b.HasIndex("DoctorId")
+                        .IsUnique()
+                        .HasFilter("[DoctorId] IS NOT NULL");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("Doctor_ID");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique()
+                        .HasFilter("[StudentId] IS NOT NULL");
+
+                    b.HasIndex("Student_ID");
 
                     b.ToTable("Notification");
                 });
@@ -717,14 +734,22 @@ namespace AIDentify.Migrations
             modelBuilder.Entity("AIDentify.Models.Notification", b =>
                 {
                     b.HasOne("AIDentify.Models.Doctor", "Doctor")
-                        .WithMany("Notifications")
-                        .HasForeignKey("DoctorId")
+                        .WithOne()
+                        .HasForeignKey("AIDentify.Models.Notification", "DoctorId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AIDentify.Models.Student", "Student")
+                    b.HasOne("AIDentify.Models.Doctor", null)
                         .WithMany("Notifications")
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("Doctor_ID");
+
+                    b.HasOne("AIDentify.Models.Student", "Student")
+                        .WithOne()
+                        .HasForeignKey("AIDentify.Models.Notification", "StudentId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AIDentify.Models.Student", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("Student_ID");
 
                     b.Navigation("Doctor");
 

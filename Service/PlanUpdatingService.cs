@@ -3,6 +3,8 @@ using AIDentify.Models.Enums;
 
 namespace AIDentify.Service
 {
+    using AIDentify.ID_Generator;
+    using AIDentify.IRepositry;
     using AIDentify.Models;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
@@ -29,6 +31,7 @@ namespace AIDentify.Service
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
+                        var _idGenerator = scope.ServiceProvider.GetRequiredService<IdGenerator>();
 
                         //var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
                         var affectedSubscriptions = dbContext.Subscription.Where(s => s.PlanId.EndsWith("Temp")).Include(s => s.Plan).ToList();
@@ -89,18 +92,55 @@ namespace AIDentify.Service
                         {
                             if (subscription.WarningDate == DateTime.Now.Date)
                             {
-                                Console.WriteLine("The plan u subscriped for has been updated or no longer exists!" +
-                                    "U need to choose one of the currently offered plans at the end of your subscription!");
+                                //Console.WriteLine("The plan u subscriped for has been updated or no longer exists!" +
+                                //    "U need to choose one of the currently offered plans at the end of your subscription!");
+
+                                string warningMessage = "The plan you subscribed to has been updated or no longer exists! " +
+                                    "You need to choose one of the currently offered plans at the end of your subscription!";
+
+                                Notification notification = new Notification
+                                {
+                                    Id = _idGenerator.GenerateId<Notification>(ModelPrefix.Notification),
+                                    NotificationContent = warningMessage,
+                                    SentAt = DateTime.UtcNow,
+                                    DoctorId = subscription.DoctorId,
+                                    StudentId = subscription.StudentId
+                                };
+                                dbContext.Notification.Add(notification);
                             }
 
                             if (subscription.EndDate <= DateTime.Now)
                             {
-                                Console.WriteLine("Your subscription has ended!" +
-                                    "U need to choose one of the currently offered plans!");
+                                //Console.WriteLine("Your subscription has ended!" +
+                                //    "U need to choose one of the currently offered plans!");
+                                string endWarningMessage = "Your subscription has ended! " +
+                                    "You need to choose one of the currently offered plans!";
+                                Notification notification = new Notification
+                                {
+                                    Id = _idGenerator.GenerateId<Notification>(ModelPrefix.Notification),
+                                    NotificationContent = endWarningMessage,
+                                    SentAt = DateTime.UtcNow,
+                                    DoctorId = subscription.DoctorId,
+                                    StudentId = subscription.StudentId
+                                };
+                                dbContext.Notification.Add(notification);
+
                                 if (subscription.IsPaid == true)
                                 {
                                     long moneyBack = subscription.Plan.Price;
-                                    Console.WriteLine("Here is your money back: " + moneyBack.ToString());
+                                    
+                                    //Console.WriteLine("Here is your money back: " + moneyBack.ToString());
+                                    string moneyMessage = "Here is your money back: " + moneyBack.ToString();
+                                    notification = new Notification
+                                    {
+                                        Id = _idGenerator.GenerateId<Notification>(ModelPrefix.Notification),
+                                        NotificationContent = moneyMessage,
+                                        SentAt = DateTime.UtcNow,
+                                        DoctorId = subscription.DoctorId,
+                                        StudentId = subscription.StudentId
+                                    };
+                                    dbContext.Notification.Add(notification);
+
                                     subscription.IsPaid = false;
                                 }
 
@@ -116,6 +156,8 @@ namespace AIDentify.Service
                                 dbContext.Remove(tempPlan);
                             }
                         }
+
+
 
                         //await dbContext.SaveChangesAsync();
                         await dbContext.SaveChangesAsync();

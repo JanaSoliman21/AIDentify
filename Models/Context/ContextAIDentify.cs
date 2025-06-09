@@ -59,14 +59,14 @@ namespace AIDentify.Models.Context
             // Notification Relationship Fix
             modelBuilder.Entity<Notification>()
                 .HasOne(s => s.Doctor)
-                .WithOne()
-                .HasForeignKey<Notification>(s => s.DoctorId)
+                .WithMany(n => n.Notifications)
+                .HasForeignKey(s => s.DoctorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Notification>()
                 .HasOne(s => s.Student)
-                .WithOne()
-                .HasForeignKey<Notification>(s => s.StudentId)
+                .WithMany(n => n.Notifications)
+                .HasForeignKey(s => s.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Payment Relationship Fix
