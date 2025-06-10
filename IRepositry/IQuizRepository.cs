@@ -9,6 +9,7 @@ namespace AIDentify.IRepositry
         void Add(Quiz quiz);
         void Update(Quiz quiz);
         bool Deleteable(Quiz quiz);
+        void UnattachOneQuestion(Quiz quiz, string questionId);
         void UnattachQuestions(Quiz quiz);
         void Delete(Quiz quiz);
         void DeleteAll();
