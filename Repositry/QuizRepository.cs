@@ -71,6 +71,20 @@ namespace AIDentify.Repositry
 
         #endregion
 
+        #region Unattach One Question
+        public void UnattachOneQuestion(Quiz quiz, string questionId)
+        {
+            var question = _context.Question.FirstOrDefault(q => q.Id == questionId);
+            if (question != null)
+            {
+                question.QuizId = null;
+                quiz.Questions.Remove(question);
+                _context.Question.Update(question);
+                _context.SaveChanges();
+            }
+        }
+        #endregion
+
         #region Unattach Questions
 
         public void UnattachQuestions(Quiz quiz)
@@ -81,6 +95,7 @@ namespace AIDentify.Repositry
                 foreach (var question in attachedQuestions)
                 {
                     question.QuizId = null;
+                    quiz.Questions.Remove(question);
                     _context.Question.Update(question);
                 }
                 _context.SaveChanges();

@@ -72,7 +72,7 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Update Quiz (Unfinished)
+        #region Update Quiz (Commented)
 
         //[HttpPut("{id}")]
         //public IActionResult Update(string id, [FromBody] Quiz quiz)
@@ -208,6 +208,26 @@ namespace AIDentify.Controllers
             return Ok("Question added to quiz successfully.");
         }
 
+        #endregion
+
+        #region Remove Question from Quiz
+        [HttpDelete("{quizId}/questions/{questionId}")]
+        public IActionResult RemoveQuestionFromQuiz(string quizId, string questionId)
+        {
+            var quiz = _quizRepository.GetById(quizId);
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found.");
+            }
+            var question = _questionRepository.GetById(questionId);
+            if (question == null)
+            {
+                return NotFound("Question not found.");
+            }
+            _quizRepository.UnattachOneQuestion(quiz, question.Id);
+            quiz.Questions.Remove(question);
+            return Ok("Question removed from quiz successfully.");
+        }
         #endregion
 
         #endregion
