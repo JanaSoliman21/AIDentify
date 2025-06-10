@@ -16,12 +16,12 @@ namespace AIDentify.Repositry
         }
         public List<Doctor> GetAllDoctors()
         {
-            var Doctors = context.Doctor.ToList();
+            var Doctors = context.Doctor.Include(d=>d.SubscriptionId).ToList();
             return Doctors;
         }
         public List<Student> GetAllStudents()
         {
-            var Students = context.Student.ToList();
+            var Students = context.Student.Include(d => d.SubscriptionId).ToList();
             return Students;
         }
         public List<Admin> GetAllAdmins()
