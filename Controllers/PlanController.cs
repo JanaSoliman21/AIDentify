@@ -44,6 +44,32 @@ namespace AIDentify.Controllers
 
         #endregion
 
+        #region Get All Plans Available for Students
+        [HttpGet("students")]
+        public IActionResult GetAllForStudent()
+        {
+            var plans = PlanRepository.GetPlansForStudent();
+            if (plans == null || !plans.Any())
+            {
+                return NotFound("No plans available for students.");
+            }
+            return Ok(plans);
+        }
+        #endregion
+
+        #region Get All Plans Available for Doctors
+        [HttpGet("doctors")]
+        public IActionResult GetAllForDoctor()
+        {
+            var plans = PlanRepository.GetPlansForDoctor();
+            if (plans == null || !plans.Any())
+            {
+                return NotFound("No plans available for doctors.");
+            }
+            return Ok(plans);
+        }
+        #endregion
+
         #region Add New Plan
 
         [HttpPost("{adminId}")] //here

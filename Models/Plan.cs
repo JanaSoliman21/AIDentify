@@ -18,7 +18,8 @@ namespace AIDentify.Models
         public int MaxScans { get; set; } = -1;
 
         [ValidateNever]
-        public int MaxPatients { get; set; } = -1;
+        [Range(0, int.MaxValue, ErrorMessage = "Max patients must be at least 0.")]
+        public int MaxPatients { get; set; } = 0;
 
         [ValidateNever]
         public long Price { get; set; } = -1;

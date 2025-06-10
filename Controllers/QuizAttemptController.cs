@@ -55,6 +55,19 @@ namespace AIDentify.Controllers
 
         #endregion
 
+        #region Get Quiz Attempts by Student ID
+        [HttpGet("student/{studentId}")]
+        public ActionResult<List<QuizAttempt>> GetAllMyAttempts(string studentId)
+        {
+            var quizAttempts = _quizAttemptRepository.GetByStudentId(studentId);
+            if (quizAttempts == null || !quizAttempts.Any())
+            {
+                return NotFound("No quiz attempts found for the specified student.");
+            }
+            return Ok(quizAttempts);
+        }
+        #endregion
+
         #region Add New Quiz Attempt (Commented)
 
         //[HttpPost]

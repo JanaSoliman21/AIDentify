@@ -7,6 +7,8 @@ namespace AIDentify.IRepositry
     {
         List<Plan> GetAll();
         Plan? Get(string id);
+        List<Plan> GetPlansForDoctor();
+        List<Plan> GetPlansForStudent();
         void Add(Plan Plan);
         List<Subscription> GetSubscriptions(Plan plan);
         void Update(Plan plan);

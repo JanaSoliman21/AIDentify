@@ -6,6 +6,7 @@ namespace AIDentify.IRepositry
     {
         List<QuizAttempt> GetAll();
         QuizAttempt GetById(string id);
+        List<QuizAttempt> GetByStudentId(string studentId);
         void Add(QuizAttempt quizAttempt);
         void Update(QuizAttempt quizAttempt);
         void Delete(QuizAttempt quizAttempt);

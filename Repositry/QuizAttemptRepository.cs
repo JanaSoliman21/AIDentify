@@ -31,8 +31,14 @@ namespace AIDentify.Repositry
 
         #endregion
 
-        #region Add
+        #region Get by Student Id
+        public List<QuizAttempt> GetByStudentId(string studentId)
+        {
+            return _context.QuizAttempt.Where(q => q.StudentId == studentId).ToList();
+        }
+        #endregion
 
+        #region Add
         public void Add(QuizAttempt quizAttempt)
         {
             var student = _context.Student.FirstOrDefault(s => s.Student_ID == quizAttempt.StudentId);

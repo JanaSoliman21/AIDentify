@@ -22,6 +22,16 @@ namespace AIDentify.Repositry
             return _context.Plan.Find(id);
         }
 
+        public List<Plan> GetPlansForDoctor()
+        {
+            return _context.Plan.Where(p => p.MaxPatients > 0).ToList();
+        }
+
+        public List<Plan> GetPlansForStudent()
+        {
+            return _context.Plan.Where(p => p.MaxPatients == 0).ToList();
+        }
+
         public void Add(Plan Plan)
         {
             _context.Plan.Add(Plan);
