@@ -4,12 +4,13 @@ using AIDentify.Models;
 using AIDentify.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AIDentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="Admin")]
+    
     public class PlanController : ControllerBase
     {
         private readonly IPlanRepository PlanRepository;
@@ -29,6 +30,7 @@ namespace AIDentify.Controllers
         #region Get All
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAll()
         {
             return Ok(PlanRepository.GetAll());
@@ -73,12 +75,20 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Add New Plan
-
-        [HttpPost("{adminId}")] //here
-        public IActionResult Add(string adminId, [FromBody] Plan plan) //here
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Add([FromBody] Plan plan)
         {
-            //make sure the admin exists
-            // to be done later
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: Admin ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("Admin ID is required");
+            }
 
             plan.Id = _idGenerator.GenerateId<Plan>(ModelPrefix.Plan);
 
@@ -104,9 +114,9 @@ namespace AIDentify.Controllers
                 UpdatedDescription = "Plan: " + plan.PlanName + " was added, with price of " + plan.Price.ToString(),
                 UpdateType = updateTypePlan,
                 AdminId = adminId
-            };  //here
+            };
 
-            SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);  //here
+            SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);
             PlanRepository.Add(plan);
 
             return Ok("Posted Successfully");
@@ -116,10 +126,20 @@ namespace AIDentify.Controllers
 
         #region Update Plan
 
-        [HttpPut("{adminId}/{id}")]     //here
-        public IActionResult Update(string adminId, string id, [FromBody] Plan plan)    //here
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Update(string id, [FromBody] Plan plan)
         {
-            //checking admin ...
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: Admin ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("Admin ID is required");
+            }
 
             plan.Id = id;
 
@@ -195,10 +215,20 @@ namespace AIDentify.Controllers
 
         #region Delete Plan
 
-        [HttpDelete("{adminId}/{id}")]      //here
-        public IActionResult Delete(string adminId, string id)      //here
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(string id)
         {
-            //checking admin ...
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: Admin ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("Admin ID is required");
+            }
 
             Plan? plan = PlanRepository.Get(id);
             if(plan != null)
@@ -211,9 +241,9 @@ namespace AIDentify.Controllers
                         UpdatedDescription = "Plan: " + plan.PlanName + " was deleted",
                         UpdateType = updateTypePlan,
                         AdminId = adminId
-                    };  //here
+                    };
 
-                    SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);  //here
+                    SystemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);
 
 
                     PlanRepository.Delete(plan);

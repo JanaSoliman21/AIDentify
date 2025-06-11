@@ -2,6 +2,7 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -25,6 +26,7 @@ namespace AIDentify.Controllers
         #region Get All Questions
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Question>> GetAll()
         {
             var questions = _questionRepository.GetAll();
@@ -55,6 +57,7 @@ namespace AIDentify.Controllers
         #region Add a New Question
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult Add([FromBody] Question question)
         {
             if (question == null)
@@ -71,6 +74,7 @@ namespace AIDentify.Controllers
         #region Update a Question
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Update(string id, [FromBody] Question question)
         {
             if (question == null)
@@ -107,6 +111,7 @@ namespace AIDentify.Controllers
         #region Delete a Question
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(string id)
         {
             var question = _questionRepository.GetById(id);

@@ -2,6 +2,7 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,6 +58,7 @@ namespace AIDentify.Controllers
         #region Add New Quiz
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add([FromBody] Quiz quiz)
         {
             if (quiz == null)
@@ -75,6 +77,7 @@ namespace AIDentify.Controllers
         #region Delete Quiz
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(string id)
         {
             var quiz = _quizRepository.GetById(id);
@@ -101,6 +104,7 @@ namespace AIDentify.Controllers
         #region Create Questions for a new Quiz
 
         [HttpPost("new/questions")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddQuestionsToNewQuiz([FromBody] List<Question> questions)
         {
             if (questions == null || !questions.Any())
@@ -130,6 +134,7 @@ namespace AIDentify.Controllers
         #region Add Questions to an Existing Quiz
 
         [HttpPost("{id}/questions")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddQuestionsToExistingQuiz(string id, [FromBody] List<Question> questions)
         {
             if (questions == null || !questions.Any())
@@ -159,6 +164,7 @@ namespace AIDentify.Controllers
         #region Add an Existing Question to an Existing Quiz
 
         [HttpPost("{quizId}/questions/{questionId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddExistingQuestionToQuiz(string quizId, string questionId)
         {
             var quiz = _quizRepository.GetById(quizId);
@@ -180,6 +186,7 @@ namespace AIDentify.Controllers
 
         #region Remove Question from Quiz
         [HttpDelete("{quizId}/questions/{questionId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult RemoveQuestionFromQuiz(string quizId, string questionId)
         {
             var quiz = _quizRepository.GetById(quizId);

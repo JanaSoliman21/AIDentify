@@ -15,6 +15,7 @@ namespace AIDentify.Models
 
         [ValidateNever]
         [ForeignKey(nameof(PlanId))]
+        [JsonIgnore]
         public Plan? Plan { get; set; }
 
         [Required]
@@ -40,13 +41,13 @@ namespace AIDentify.Models
         public string? DoctorId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(DoctorId))]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Doctor? Doctor { get; set; }
 
         public string? StudentId { get; set; }
         [ValidateNever]
         [ForeignKey(nameof(StudentId))]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Student? Student { get; set; }
 
     }
