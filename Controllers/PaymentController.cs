@@ -2,9 +2,7 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
-using AIDentify.Repositry;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
 
 namespace AIDentify.Controllers
 {
@@ -44,7 +42,7 @@ namespace AIDentify.Controllers
 
         #region Get a Specific Payment by ID for this User
 
-        [HttpGet("{userId}/{id}")]
+        [HttpGet("user/{userId}/payment/{id}")]
         public ActionResult<Payment> Get(string userId, string id)
         {
             var payment = _paymentRepository.Get(userId, id);
@@ -59,7 +57,7 @@ namespace AIDentify.Controllers
 
         #region Update an Existing Payment for this User
 
-        [HttpPut("{userId}/{id}")]
+        [HttpPut("user/{userId}/payment/{id}")]
         public ActionResult Update(string userId, string id, [FromBody] Payment payment)
         {
             try
@@ -72,16 +70,16 @@ namespace AIDentify.Controllers
                 }
 
                 // Update payment details
-                if(payment.WayOfPayment != WayOfPayment.None)
+                if (payment.WayOfPayment != WayOfPayment.None)
                 {
                     existingPayment.WayOfPayment = payment.WayOfPayment;
                 }
-                if(payment.Amount != -1)
+                if (payment.Amount != -1)
                 {
                     existingPayment.Amount = payment.Amount;
                 }
                 existingPayment.PaymentDate = DateTime.Now;
-                
+
 
                 _paymentRepository.Update(userId, existingPayment);
 
@@ -112,7 +110,7 @@ namespace AIDentify.Controllers
 
         #region Delete a Payment for this User
 
-        [HttpDelete("{userId}/{paymentId}")]
+        [HttpDelete("user/{userId}/payment/{id}")]
         public ActionResult Delete(string userId, string paymentId)
         {
             try
@@ -172,7 +170,7 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Admin approves or rejects a payment
-        
+
         [HttpPut("update-status/{adminId}/{paymentId}")]
         public IActionResult UpdatePaymentStatus(string adminId, string paymentId, [FromBody] string status)
         {
@@ -183,12 +181,21 @@ namespace AIDentify.Controllers
                 return BadRequest("You have to enter a status.");
             }
 
-            if (Enum.TryParse(status, true, out PaymentStatues parsedStatus))
+
+
+            if (Enum.TryParse(status, true, out PaymentStatus parsedStatus))
             {
                 var payment = _paymentRepository.GetPendingPayments().FirstOrDefault(p => p.Id == paymentId);
+
+                if (payment == null)
+                    return NotFound("Pending payment not found.");
+
                 var subscription = _subscriptionRepository.GetSubscriptionByUserId(payment.DoctorId ?? payment.StudentId);
 
-                if (parsedStatus == PaymentStatues.Completed)
+                if (payment.Status == PaymentStatus.Completed)
+                    return BadRequest("Cannot update a completed payment.");
+
+                if (parsedStatus == PaymentStatus.Completed)
                 {
                     subscription.IsPaid = true;
                 }
@@ -196,7 +203,7 @@ namespace AIDentify.Controllers
                 SystemUpdate systemUpdate = new SystemUpdate
                 {
                     Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
-                    UpdatedDescribtion = "Payment: " + paymentId + " was updated to be " + parsedStatus,
+                    UpdatedDescription = "Payment: " + paymentId + " was updated to be " + parsedStatus,
                     UpdateType = updateTypePayment,
                     AdminId = adminId
                 };
@@ -209,7 +216,7 @@ namespace AIDentify.Controllers
 
             return BadRequest("Please write 'Pending', 'Completed', or 'Failed'.");
         }
-        
+
         #endregion
 
     }

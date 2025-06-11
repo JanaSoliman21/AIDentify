@@ -16,14 +16,14 @@ namespace AIDentify.Repositry
         }
 
         #region Get All Notifications
-        public List<Notification?> GetAllNotifications()
+        public List<Notification> GetAllNotifications()
         {
             return _context.Notification.Include(n => n.Doctor).Include(n => n.Student).ToList();
         }
         #endregion
 
         #region Get Notifications by User Id
-        public List<Notification?> GetNotificationsByUserId(string userId)
+        public List<Notification> GetNotificationsByUserId(string userId)
         {
             return _context.Notification
                 .Where(n => n.DoctorId == userId || n.StudentId == userId)
@@ -34,7 +34,7 @@ namespace AIDentify.Repositry
         #endregion
 
         #region Get Notification by Id
-        public Notification? GetNotification(string id)
+        public Notification GetNotification(string id)
         {
             return _context.Notification
                 .Include(n => n.Doctor)

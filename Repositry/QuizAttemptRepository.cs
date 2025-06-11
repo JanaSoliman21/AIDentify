@@ -91,7 +91,7 @@ namespace AIDentify.Repositry
 
         #endregion
 
-        #region Increment Score for Student (Unfinished)
+        #region Increment Score for Student
 
         public void IncrementTotalPointsForStudent(string studentId, int totalPoints)
         {

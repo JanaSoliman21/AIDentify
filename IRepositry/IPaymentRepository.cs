@@ -11,6 +11,6 @@ namespace AIDentify.IRepositry
         void Update(string userId, Payment payment);
         void Delete(string userId, Payment payment);
         IEnumerable<Payment> GetPendingPayments();  // Get all pending payments for admin
-        void UpdateStatus(string paymentId, PaymentStatues status);  // Admin approval/rejection
+        void UpdateStatus(string paymentId, PaymentStatus status);  // Admin approval/rejection
     }
 }

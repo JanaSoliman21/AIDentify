@@ -7,7 +7,6 @@ namespace AIDentify.IRepositry
         List<Quiz> GetAll();
         Quiz GetById(string id);
         void Add(Quiz quiz);
-        void Update(Quiz quiz);
         bool Deleteable(Quiz quiz);
         void UnattachOneQuestion(Quiz quiz, string questionId);
         void UnattachQuestions(Quiz quiz);

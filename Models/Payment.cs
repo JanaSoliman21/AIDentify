@@ -23,7 +23,7 @@ namespace AIDentify.Models
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
-        public PaymentStatues Status { get; set; }
+        public PaymentStatus Status { get; set; }
 
         // Either a Doctor or a Student makes the payment
         public string? DoctorId { get; set; }

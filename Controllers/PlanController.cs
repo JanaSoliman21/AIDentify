@@ -17,6 +17,8 @@ namespace AIDentify.Controllers
         private readonly IdGenerator _idGenerator;
         private UpdateType updateTypePlan = UpdateType.Plan;
 
+        private const int TheNullValue = -1;
+
         public PlanController(IPlanRepository planRepository, IdGenerator idGenerator, ISystemUpdateRepository systemUpdateRepository)
         {
             PlanRepository = planRepository;
@@ -84,26 +86,22 @@ namespace AIDentify.Controllers
             {
                 return BadRequest("Plan name cannot be empty.");
             }
-            if (plan.Duration == -1)
+            if (plan.Duration == TheNullValue)
             {
                 return BadRequest("Duration cannot be empty.");
             }
-            if (plan.MaxScans == -1)
+            if (plan.MaxScans == TheNullValue)
             {
                 return BadRequest("Max Scans cannot be empty.");
             }
-            if (plan.MaxPatients == -1)
-            {
-                return BadRequest("Max Patients cannot be empty.");
-            }
-            if (plan.Price == -1)
+            if (plan.Price == TheNullValue)
             {
                 return BadRequest("Price cannot be empty.");
             }
 
             SystemUpdate systemUpdate = new SystemUpdate {
                 Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
-                UpdatedDescribtion = "Plan: " + plan.PlanName + " was added, with price of " + plan.Price.ToString(),
+                UpdatedDescription = "Plan: " + plan.PlanName + " was added, with price of " + plan.Price.ToString(),
                 UpdateType = updateTypePlan,
                 AdminId = adminId
             };  //here
@@ -158,19 +156,19 @@ namespace AIDentify.Controllers
             {
                 plan.PlanName = existingPlan.PlanName;
             }
-            if (plan.Duration == -1)
+            if (plan.Duration == TheNullValue)
             {
                 plan.Duration = existingPlan.Duration;
             }
-            if (plan.MaxScans == -1)
+            if (plan.MaxScans == TheNullValue)
             {
                 plan.MaxScans = existingPlan.MaxScans;
             }
-            if (plan.MaxPatients == -1)
+            if (plan.MaxPatients == TheNullValue)
             {
                 plan.MaxPatients = existingPlan.MaxPatients;
             }
-            if (plan.Price == -1)
+            if (plan.Price == TheNullValue)
             {
                 plan.Price = existingPlan.Price;
             }
@@ -178,7 +176,7 @@ namespace AIDentify.Controllers
             SystemUpdate systemUpdate = new SystemUpdate
             {
                 Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
-                UpdatedDescribtion = "Plan: " + plan.PlanName + " was updated",
+                UpdatedDescription = "Plan: " + plan.PlanName + " was updated",
                 UpdateType = updateTypePlan,
                 AdminId = adminId
             };  //here
@@ -210,7 +208,7 @@ namespace AIDentify.Controllers
                     SystemUpdate systemUpdate = new SystemUpdate
                     {
                         Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
-                        UpdatedDescribtion = "Plan: " + plan.PlanName + " was deleted",
+                        UpdatedDescription = "Plan: " + plan.PlanName + " was deleted",
                         UpdateType = updateTypePlan,
                         AdminId = adminId
                     };  //here

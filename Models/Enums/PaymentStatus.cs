@@ -1,6 +1,6 @@
 ﻿namespace AIDentify.Models.Enums
 {
-    public enum PaymentStatues
+    public enum PaymentStatus
     {
         Pending,    // Waiting for admin approval
         Completed,  // Approved by admin, subscription activated

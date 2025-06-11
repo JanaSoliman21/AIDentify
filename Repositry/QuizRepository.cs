@@ -43,20 +43,6 @@ namespace AIDentify.Repositry
 
         #endregion
 
-        #region Update
-
-        public void Update(Quiz quiz)
-        {
-            var existingQuiz = _context.Quiz.FirstOrDefault(q => q.Id == quiz.Id);
-            if (existingQuiz != null)
-            {
-                _context.Quiz.Update(quiz);
-                _context.SaveChanges();
-            }
-        }
-
-        #endregion
-
         #region Deleteable
 
         public bool Deleteable(Quiz quiz)
