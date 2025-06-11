@@ -14,9 +14,9 @@ namespace AIDentify.Controllers
     {
       
         private readonly IIdentityRepo _identityRepo;
-        private readonly IUserRepositry userRepositry;
+        private readonly IUserRepository userRepositry;
 
-        public AccountController(IIdentityRepo _identityRepo, IUserRepositry userRepositry, SignInManager<ApplicationUser> signInManager)
+        public AccountController(IIdentityRepo _identityRepo, IUserRepository userRepositry, SignInManager<ApplicationUser> signInManager)
         {
             this._identityRepo = _identityRepo;
             this.userRepositry = userRepositry;
@@ -121,7 +121,7 @@ namespace AIDentify.Controllers
             var result = await _identityRepo.LogoutAsync(token);
             if (!result.Success)
             {
-                return BadRequest(new { message = "No token provided"});
+                return BadRequest(new { result.Errors });
             }
             return Ok(new { message = "Logged out successfully"});
         }

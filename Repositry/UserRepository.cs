@@ -5,29 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AIDentify.Repositry
 {
-    public class UserRepositry:IUserRepositry
+    public class UserRepository:IUserRepository
     {
         
         private readonly ContextAIDentify context;
-        public UserRepositry(ContextAIDentify context)
+        public UserRepository(ContextAIDentify context)
         {
             
             this.context = context;
         }
-        public List<Doctor> GetAllDoctors()
+        public async Task<List<Doctor>> GetAllDoctorsAsync()
         {
-            var Doctors = context.Doctor.Include(d=>d.SubscriptionId).ToList();
-            return Doctors;
+            return await context.Doctor.Include(d => d.SubscriptionId).ToListAsync(); ;
         }
-        public List<Student> GetAllStudents()
+        public async Task<List<Student>> GetAllStudentsAsync()
         {
-            var Students = context.Student.Include(d => d.SubscriptionId).ToList();
-            return Students;
+            return await context.Student.Include(d => d.SubscriptionId).ToListAsync();
+
         }
-        public List<Admin> GetAllAdmins()
+        public async Task<List<Admin>> GetAllAdminsAsync()
         {
-            var Admins = context.Admin.ToList();
-            return Admins;
+            return await context.Admin.ToListAsync(); 
         }
         public async Task AddAsAdminAsync(ApplicationUser user)
         {

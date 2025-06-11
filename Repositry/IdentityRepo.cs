@@ -28,61 +28,61 @@ namespace AIDentify.Repositry
 
         public async Task<(bool Success, List<string> Errors, ApplicationUser? User)> RegisterAsAdminAsync(Admin user)
         {
-            ApplicationUser user1 = new ApplicationUser();
+            ApplicationUser newUser = new ApplicationUser();
             {
-                user1.FirstName = user.FirstName;
-                user1.LastName = user.LastName;
-                user1.UserName = user.UserName;
-                user1.Email = user.Email;
+                newUser.FirstName = user.FirstName;
+                newUser.LastName = user.LastName;
+                newUser.UserName = user.UserName;
+                newUser.Email = user.Email;
 
             }
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
+            IdentityResult result = await _userManager.CreateAsync(newUser, user.Password);
             if (!result.Succeeded)
             {
                 return (false, result.Errors.Select(e => e.Description).ToList(),null);
             }
-            await _userManager.AddToRoleAsync(user1, "Admin");
-            return (true, new List<string>(),user1);
+            await _userManager.AddToRoleAsync(newUser, "Admin");
+            return (true, new List<string>(),newUser);
         }
         public async Task<(bool Success, List<string> Errors, ApplicationUser? User)> RegisterAsDoctorAsync(Doctor user)
         {
-            ApplicationUser user1 = new ApplicationUser();
+            ApplicationUser newUser = new ApplicationUser();
             {
-                user1.FirstName = user.FirstName;
-                user1.LastName = user.LastName;
-                user1.UserName = user.UserName;
-                user1.Email = user.Email;
-                user1.ClinicName = user.ClinicName;
+                newUser.FirstName = user.FirstName;
+                newUser.LastName = user.LastName;
+                newUser.UserName = user.UserName;
+                newUser.Email = user.Email;
+                newUser.ClinicName = user.ClinicName;
 
             }
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
+            IdentityResult result = await _userManager.CreateAsync(newUser, user.Password);
             if (!result.Succeeded)
             {
                 return (false, result.Errors.Select(e => e.Description).ToList(),null);
             }
-            await _userManager.AddToRoleAsync(user1, "Doctor");
-            return (true, new List<string>(),user1);
+            await _userManager.AddToRoleAsync(newUser, "Doctor");
+            return (true, new List<string>(),newUser);
         }
 
         public async Task<(bool Success, List<string> Errors, ApplicationUser? User)> RegisterAsStudentAsync(Student user)
         {
-            ApplicationUser user1 = new ApplicationUser();
+            ApplicationUser newUser = new ApplicationUser();
             {
-                user1.FirstName = user.FirstName;
-                user1.LastName = user.LastName;
-                user1.UserName = user.UserName;
-                user1.Email = user.Email;
-                user1.University = user.University;
-                user1.Level = user.Level;
+                newUser.FirstName = user.FirstName;
+                newUser.LastName = user.LastName;
+                newUser.UserName = user.UserName;
+                newUser.Email = user.Email;
+                newUser.University = user.University;
+                newUser.Level = user.Level;
 
             }
-            IdentityResult result = await _userManager.CreateAsync(user1, user.Password);
+            IdentityResult result = await _userManager.CreateAsync(newUser, user.Password);
             if (!result.Succeeded)
             {
                 return (false, result.Errors.Select(e => e.Description).ToList(),null);
             }
-            await _userManager.AddToRoleAsync(user1, "Student");
-            return (true, new List<string>(),user1);
+            await _userManager.AddToRoleAsync(newUser, "Student");
+            return (true, new List<string>(),newUser);
         }
 
         public async Task<(bool Success, string Token, List<string> Errors, List<string> Roles)> LoginAsync(string Username,String password)
