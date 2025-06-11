@@ -57,65 +57,6 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Add a New Payment for this User (Commented)
-
-        //[HttpPost("{userId}")]
-        //public ActionResult Add(string userId, [FromBody] Payment payment)
-        //{
-        //    try
-        //    {
-        //        // Save the Payment
-        //        payment.Id = _idGenerator.GenerateId<Payment>(ModelPrefix.Payment);
-        //        _paymentRepository.Add(userId, payment);
-
-        //        Subscription? subscription = _subscriptionRepository.GetSubscriptionByUserId(userId);
-        //        bool isNewSubscription = false;
-
-        //        if (subscription == null)
-        //        {
-        //            isNewSubscription = true;
-        //            subscription = new Subscription
-        //            {
-        //                PlanId = "1", // Default Plan (Ensure it's valid)
-        //                StartDate = payment.PaymentDate,
-        //                IsPaid = true
-        //            };
-
-        //            // Fetch Plan Duration (Avoids Null Reference Exception)
-        //            var plan = subscription.Plan;
-        //            int duration = plan?.Duration ?? 0;
-        //            subscription.EndDate = subscription.StartDate.AddMonths(duration);
-        //        }
-        //        else
-        //        {
-        //            subscription.StartDate = payment.PaymentDate;
-
-        //            // Fetch Plan Duration
-        //            var plan = subscription.Plan;
-        //            int duration = plan?.Duration ?? 0;
-
-        //            subscription.EndDate = subscription.StartDate.AddMonths(duration);
-        //            subscription.IsPaid = true;
-        //        }
-
-        //        // Save the Subscription
-        //        if (isNewSubscription)
-        //            _subscriptionRepository.AddSubscription(subscription, userId);
-        //        else
-        //            _subscriptionRepository.UpdateSubscription(subscription);
-
-
-
-        //        return Ok("Payment added successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest($"Error: {ex.Message}");
-        //    }
-        //}
-
-        #endregion
-
         #region Update an Existing Payment for this User
 
         [HttpPut("{userId}/{id}")]
@@ -244,6 +185,14 @@ namespace AIDentify.Controllers
 
             if (Enum.TryParse(status, true, out PaymentStatues parsedStatus))
             {
+                var payment = _paymentRepository.GetPendingPayments().FirstOrDefault(p => p.Id == paymentId);
+                var subscription = _subscriptionRepository.GetSubscriptionByUserId(payment.DoctorId ?? payment.StudentId);
+
+                if (parsedStatus == PaymentStatues.Completed)
+                {
+                    subscription.IsPaid = true;
+                }
+
                 SystemUpdate systemUpdate = new SystemUpdate
                 {
                     Id = _idGenerator.GenerateId<SystemUpdate>(ModelPrefix.SystemUpdate),
@@ -253,7 +202,7 @@ namespace AIDentify.Controllers
                 };
 
                 _systemUpdateRepository.AddSystemUpdate(adminId, systemUpdate);
-
+                _subscriptionRepository.UpdateSubscription(subscription);
                 _paymentRepository.UpdateStatus(paymentId, parsedStatus);
                 return Ok($"Payment {paymentId} updated to {parsedStatus}");
             }
@@ -264,32 +213,4 @@ namespace AIDentify.Controllers
         #endregion
 
     }
-
-    #region DTOs (Data Transfer Objects) (Commented)
-
-    //// DTO for creating a new payment
-    //public class PaymentRequest
-    //{
-    //    public string Amount { get; set; }
-    //    public DateTime PaymentDate { get; set; }
-    //    public string WayOfPayment { get; set; }
-    //    public string SubscriptionId { get; set; }
-    //}
-    //// DTO for updating an existing payment
-    //public class PaymentUpdateRequest
-    //{
-    //    public string Amount { get; set; }
-    //    public DateTime PaymentDate { get; set; }
-    //    public string WayOfPayment { get; set; }
-    //}
-    #endregion
-
 }
-
-    //// DTO for updating payment status
-    //public class PaymentStatusUpdateRequest
-    //{
-    //    public PaymentStatus Status { get; set; }
-    //    public string AdminId { get; set; } // Admin who reviews the payment
-    //}
-

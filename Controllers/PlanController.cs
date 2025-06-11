@@ -13,16 +13,16 @@ namespace AIDentify.Controllers
     public class PlanController : ControllerBase
     {
         private readonly IPlanRepository PlanRepository;
-        private readonly ISystemUpdateRepository SystemUpdateRepository;    //here
+        private readonly ISystemUpdateRepository SystemUpdateRepository;
         private readonly IdGenerator _idGenerator;
-        private UpdateType updateTypePlan = UpdateType.Plan;    //here
+        private UpdateType updateTypePlan = UpdateType.Plan;
 
         public PlanController(IPlanRepository planRepository, IdGenerator idGenerator, ISystemUpdateRepository systemUpdateRepository)
         {
             PlanRepository = planRepository;
             _idGenerator = idGenerator;
             SystemUpdateRepository = systemUpdateRepository;
-        }   //here
+        }
 
         #region Get All
 

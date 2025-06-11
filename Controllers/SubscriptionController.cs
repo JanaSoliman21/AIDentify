@@ -76,22 +76,6 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Add New Subscription (Commented)
-
-        //[HttpPost("user={userId}")]
-        //public IActionResult Add([FromBody] Subscription subscription, string userId)
-        //{
-        //    subscription.Id = _idGenerator.GenerateId<Subscription>(ModelPrefix.Subscription);
-        //    if (subscription.PlanId == null || !PlanRepository.PlanExists(subscription.PlanId))
-        //    {
-        //        return BadRequest("Plan not found.");
-        //    }
-        //    SubscriptionRepository.AddSubscription(subscription, userId);
-        //    return Ok("Posted Successfully");
-        //}
-
-        #endregion
-
         #region Update Subscription
 
         [HttpPut("{id}")]
@@ -381,8 +365,6 @@ namespace AIDentify.Controllers
                 {
                     return BadRequest("Payment amount does not match the plan price.");
                 }
-                // set the subscription as paid
-                subscription.IsPaid = true;
             }
 
             //// save all changes
