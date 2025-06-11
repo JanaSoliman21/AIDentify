@@ -24,7 +24,7 @@ namespace AIDentify.Repositry
         #region Get by Id
         public SystemUpdate GetSystemUpdate(string id)
         {
-            return _contextAIDentify.SystemUpdate.Include(s => s.Admin).FirstOrDefault();
+            return _contextAIDentify.SystemUpdate.Include(s => s.Admin).FirstOrDefault(s => s.Id == id);
         }
         #endregion
 
@@ -43,6 +43,7 @@ namespace AIDentify.Repositry
             {
                 admin.SystemUpdates.Add(systemUpdate);
                 _contextAIDentify.Add(systemUpdate);
+                _contextAIDentify.SaveChanges();
             }
         }
         #endregion

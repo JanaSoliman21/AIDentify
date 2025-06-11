@@ -27,7 +27,7 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Get Notifications by User Id
-        [HttpGet("{userId}")]
+        [HttpGet("byUser/{userId}")]
         public ActionResult<List<Notification?>> GetNotificationsByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))

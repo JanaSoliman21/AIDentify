@@ -1,5 +1,4 @@
 ﻿using AIDentify.IRepositry;
-using AIDentify.Migrations;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
 using AIDentify.Models.Context;
@@ -176,13 +175,13 @@ namespace AIDentify.Repositry
         
         public IEnumerable<Payment> GetPendingPayments()
         {
-            return _context.Payment.Where(p => p.Status == PaymentStatues.Pending).ToList();
+            return _context.Payment.Where(p => p.Status == PaymentStatus.Pending).ToList();
         }
 
         #endregion
 
         #region Admin approves or rejects a payment
-        public void UpdateStatus(string paymentId, PaymentStatues status)
+        public void UpdateStatus(string paymentId, PaymentStatus status)
         {
             var payment = _context.Payment.FirstOrDefault(p => p.Id == paymentId);
             if (payment != null)

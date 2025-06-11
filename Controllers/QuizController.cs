@@ -72,27 +72,6 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Update Quiz (Commented)
-
-        //[HttpPut("{id}")]
-        //public IActionResult Update(string id, [FromBody] Quiz quiz)
-        //{
-        //    if (quiz == null)
-        //    {
-        //        return BadRequest("Quiz cannot be null.");
-        //    }
-        //    var existingQuiz = _quizRepository.GetById(id);
-        //    if (existingQuiz == null)
-        //    {
-        //        return NotFound("Quiz not found.");
-        //    }
-        //    quiz.Id = id;
-        //    _quizRepository.Update(quiz);
-        //    return Ok("Updated Successfully");
-        //}
-
-        #endregion
-
         #region Delete Quiz
 
         [HttpDelete("{id}")]
@@ -112,17 +91,6 @@ namespace AIDentify.Controllers
             _quizRepository.Delete(quiz);
             return Ok("Deleted Successfully");
         }
-
-        #endregion
-
-        #region Delete All Quizzes (Commented)
-
-        //[HttpDelete]
-        //public IActionResult DeleteAll()
-        //{
-        //    _quizRepository.DeleteAll();
-        //    return Ok("All quizzes deleted successfully.");
-        //}
 
         #endregion
 

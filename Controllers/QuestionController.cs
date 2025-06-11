@@ -119,16 +119,5 @@ namespace AIDentify.Controllers
         }
 
         #endregion
-
-        #region Delete All Questions (Commented)
-
-        //[HttpDelete]
-        //public ActionResult DeleteAll()
-        //{
-        //    _questionRepository.DeleteAll();
-        //    return Ok("All questions deleted successfully.");
-        //}
-
-        #endregion
     }
 }

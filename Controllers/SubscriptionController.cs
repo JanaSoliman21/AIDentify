@@ -134,7 +134,7 @@ namespace AIDentify.Controllers
                             }
                             payment.Id = _idGenerator.GenerateId<Payment>(ModelPrefix.Payment);
                             payment.PaymentDate = DateTime.Now;
-                            payment.Status = PaymentStatues.Pending;
+                            payment.Status = PaymentStatus.Pending;
                         }
                         else
                         {
@@ -256,7 +256,7 @@ namespace AIDentify.Controllers
             payment.PaymentDate = DateTime.Now;
 
             // Set initial status
-            payment.Status = PaymentStatues.Pending;
+            payment.Status = PaymentStatus.Pending;
 
             //// create a new subscription
             // set the subscription id
@@ -331,7 +331,7 @@ namespace AIDentify.Controllers
             payment.PaymentDate = DateTime.Now;
 
             // Set initial status
-            payment.Status = PaymentStatues.Pending;
+            payment.Status = PaymentStatus.Pending;
 
             if (subscription.PlanId == null || !PlanRepository.PlanExists(subscription.PlanId))
             {

@@ -68,43 +68,6 @@ namespace AIDentify.Controllers
         }
         #endregion
 
-        #region Add New Quiz Attempt (Commented)
-
-        //[HttpPost]
-        //public IActionResult Add([FromBody] QuizAttempt quizAttempt)
-        //{
-        //    if (quizAttempt == null)
-        //    {
-        //        return BadRequest("Quiz attempt cannot be null.");
-        //    }
-        //    quizAttempt.Id = _idGenerator.GenerateId<QuizAttempt>(ModelPrefix.QuizAttempt);
-        //    _quizAttemptRepository.Add(quizAttempt);
-        //    return Ok("Posted Successfully");
-        //}
-
-        #endregion
-
-        #region Update Quiz Attempt (Commented)
-
-        //[HttpPut("{id}")]
-        //public IActionResult Update(string id, [FromBody] QuizAttempt quizAttempt)
-        //{
-        //    if (quizAttempt == null)
-        //    {
-        //        return BadRequest("Quiz attempt cannot be null.");
-        //    }
-        //    var existingQuizAttempt = _quizAttemptRepository.GetById(id);
-        //    if (existingQuizAttempt == null)
-        //    {
-        //        return NotFound("Quiz attempt not found.");
-        //    }
-        //    quizAttempt.Id = id;
-        //    _quizAttemptRepository.Update(quizAttempt);
-        //    return Ok("Updated Successfully");
-        //}
-
-        #endregion
-
         #region Delete Quiz Attempt
 
         [HttpDelete("{id}")]
@@ -118,17 +81,6 @@ namespace AIDentify.Controllers
             _quizAttemptRepository.Delete(existingQuizAttempt);
             return Ok("Deleted Successfully");
         }
-
-        #endregion
-
-        #region Delete All Quiz Attempts (Commented)
-
-        //[HttpDelete]
-        //public IActionResult DeleteAll()
-        //{
-        //    _quizAttemptRepository.DeleteAll();
-        //    return Ok("All quiz attempts deleted successfully.");
-        //}
 
         #endregion
 

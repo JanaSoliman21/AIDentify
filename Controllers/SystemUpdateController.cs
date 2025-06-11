@@ -38,7 +38,7 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Get All for this Admin
-        [HttpGet("admin = {adminId}")]
+        [HttpGet("admin/{adminId}")]
         public IActionResult GetAllForAdmin(string adminId)
         {
             return Ok(_systemUpdateRepository.GetAllSystemUpdateByAdminId(adminId));
@@ -50,9 +50,9 @@ namespace AIDentify.Controllers
         public IActionResult UpdateSystemUpdate(string id, [FromBody] SystemUpdate systemUpdate)
         {
             var updatedSystemUpdate = _systemUpdateRepository.GetSystemUpdate(id);
-            if (systemUpdate.UpdatedDescribtion != null && updatedSystemUpdate.UpdatedDescribtion != systemUpdate.UpdatedDescribtion)
+            if (systemUpdate.UpdatedDescription != null && updatedSystemUpdate.UpdatedDescription != systemUpdate.UpdatedDescription)
             {
-                updatedSystemUpdate.UpdatedDescribtion = systemUpdate.UpdatedDescribtion;
+                updatedSystemUpdate.UpdatedDescription = systemUpdate.UpdatedDescription;
             }
             if (updatedSystemUpdate.UpdateType != UpdateType.None && updatedSystemUpdate.UpdateType != systemUpdate.UpdateType)
             {

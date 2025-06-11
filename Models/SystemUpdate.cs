@@ -13,7 +13,7 @@ namespace AIDentify.Models
         public string Id { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string UpdatedDescribtion { get; set; } = string.Empty;
+        public string UpdatedDescription { get; set; } = string.Empty;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [ValidateNever]
