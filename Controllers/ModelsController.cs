@@ -4,9 +4,7 @@ using AIDentify.DTO;
 using AIDentify.ID_Generator;
 using AIDentify.IRepositry;
 using AIDentify.Models;
-using AIDentify.Models.Context;
 using AIDentify.Models.Enums;
-using AIDentify.Repositry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -271,14 +269,6 @@ namespace AIDentify.Controllers
             {
                 return BadRequest("No file uploaded.");
             }
-
-            //var existingScan = await context.XRayScan
-            //    .FirstOrDefaultAsync(x => x.ImagePath == request.File.FileName);
-
-            //if (existingScan != null)
-            //{
-            //    return BadRequest("This image has already been processed.");
-            //}
 
             using var memoryStream = new MemoryStream();
             await request.File.CopyToAsync(memoryStream);

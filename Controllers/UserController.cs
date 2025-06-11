@@ -14,13 +14,11 @@ namespace AIDentify.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IUserRepository userRepository;
         private readonly ContextAIDentify context;
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager ,IUserRepository userRepository, ContextAIDentify context)
+        public UserController(UserManager<ApplicationUser> userManager ,IUserRepository userRepository, ContextAIDentify context)
         {
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.userRepository = userRepository;
             this.context = context;
             
