@@ -15,32 +15,32 @@ namespace AIDentify.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-        IUserRepositry userA;
+        private readonly IUserRepository userRepository;
         private readonly ContextAIDentify context;
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager ,IUserRepositry userA, ContextAIDentify context)
+        public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager ,IUserRepository userRepository, ContextAIDentify context)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.userA = userA;
+            this.userRepository = userRepository;
             this.context = context;
             
         }
         [Authorize(Roles ="Admin")]
         [HttpGet("GetAllDoctors")]
-        public async Task<IActionResult> GetAllDoctor()
+        public async Task<IActionResult> GetAllDoctors()
         {
 
-            var doctors = userA.GetAllDoctors();
+            var doctors = userRepository.GetAllDoctorsAsync();
             return Ok(doctors);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("GetAllStudents")]
-        public async Task<IActionResult> GetAllStudent()
+        public async Task<IActionResult> GetAllStudents()
         {
 
-            var student = userA.GetAllStudents();
-            return Ok(student);
+            var students = userRepository.GetAllStudentsAsync();
+            return Ok(students);
         }
 
         [Authorize(Roles = "Admin")]
@@ -48,8 +48,8 @@ namespace AIDentify.Controllers
         public async Task<IActionResult> GetAllAdmins()
         {
 
-            var admin = userA.GetAllAdmins();
-            return Ok(admin);
+            var admins = userRepository.GetAllAdminsAsync();
+            return Ok(admins);
         }
 
         [Authorize]
@@ -116,7 +116,7 @@ namespace AIDentify.Controllers
 
         [Authorize]
         [HttpPut("UpdateUserProfile")]
-        public async Task<IActionResult> UpdateProfile(UpdateProfileDto profile)
+        public async Task<IActionResult> UpdateUserProfile(UpdateProfileDto profile)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -128,12 +128,10 @@ namespace AIDentify.Controllers
                 return NotFound(new { message = "User not found" });
 
             var roles = await userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault(); // Assuming one role per user
+            var role = roles.FirstOrDefault(); 
 
-            // Logging for Debugging
             Console.WriteLine($"Updating User: {user.Id}, Role: {role}");
 
-            // Ensure fields are only updated if they are non-empty
             user.FirstName = !string.IsNullOrWhiteSpace(profile.FirstName) ? profile.FirstName : user.FirstName;
             user.LastName = !string.IsNullOrWhiteSpace(profile.LastName) ? profile.LastName : user.LastName;
             user.UserName = !string.IsNullOrWhiteSpace(profile.UserName) ? profile.UserName : user.UserName;
@@ -152,13 +150,13 @@ namespace AIDentify.Controllers
                     doctor.Email = user.Email;
                     doctor.ClinicName = user.ClinicName;
 
-                    context.Entry(doctor).State = EntityState.Modified; // Proper tracking
+                    context.Entry(doctor).State = EntityState.Modified; 
                 }
             }
             else if (role == "Student")
             {
                 user.University = !string.IsNullOrWhiteSpace(profile.University) ? profile.University : user.University;
-                user.Level = profile.Level.HasValue ? profile.Level.Value : user.Level; // Proper handling for nullable int
+                user.Level = profile.Level.HasValue ? profile.Level.Value : user.Level; 
 
                 var student = await context.Student.FirstOrDefaultAsync(s => s.Student_ID == user.Id);
                 if (student != null)
@@ -191,7 +189,6 @@ namespace AIDentify.Controllers
                 return BadRequest(new { message = "Role not recognized" });
             }
 
-            // ✅ Save changes
             await context.SaveChangesAsync();
 
             var result = await userManager.UpdateAsync(user);

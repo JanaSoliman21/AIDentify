@@ -3,11 +3,11 @@
 
 namespace AIDentify.IRepositry
 {
-    public interface IUserRepositry
+    public interface IUserRepository
     {
-        List<Doctor> GetAllDoctors();
-        List<Student> GetAllStudents();
-        List<Admin> GetAllAdmins();
+        Task<List<Doctor>> GetAllDoctorsAsync();
+        Task<List<Student>> GetAllStudentsAsync();
+        Task<List<Admin>> GetAllAdminsAsync();
         Task AddAsAdminAsync(ApplicationUser user);
         Task AddAsDoctorAsync(ApplicationUser user);
         Task AddAsStudentAsync(ApplicationUser user);
