@@ -111,10 +111,6 @@ namespace AIDentify.Repositry
             {
                 throw new Exception("Student not found");
             }
-            context.Payment.RemoveRange(context.Payment.Where(p => p.StudentId == id));
-            context.QuizAttempt.RemoveRange(context.QuizAttempt.Where(q => q.StudentId == id));
-            context.Notification.RemoveRange(context.Notification.Where(n => n.StudentId == id));
-            context.Subscription.Remove(context.Subscription.FirstOrDefault(s => s.StudentId == id));
             context.Student.Remove(Student);
             await context.SaveChangesAsync();
         }
@@ -126,9 +122,6 @@ namespace AIDentify.Repositry
             {
                 throw new Exception("Doctor not found");
             }
-            context.Payment.RemoveRange(context.Payment.Where(p => p.DoctorId == id));
-            context.Notification.RemoveRange(context.Notification.Where(q => q.DoctorId == id));
-            context.Subscription.Remove(context.Subscription.FirstOrDefault(s => s.DoctorId == id));
             context.Doctor.Remove(Doctor);
             await context.SaveChangesAsync();
         }

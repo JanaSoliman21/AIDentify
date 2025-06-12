@@ -68,6 +68,13 @@ namespace AIDentify.Models.Context
                 .HasForeignKey(s => s.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // SystemUpdate
+            modelBuilder.Entity<SystemUpdate>()
+                .HasOne(s => s.Admin)
+                .WithMany()
+                .HasForeignKey(s => s.AdminId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Payment
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Doctor)
@@ -80,12 +87,14 @@ namespace AIDentify.Models.Context
                 .WithMany(s => s.Payments)
                 .HasForeignKey(p => p.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             //MedicalHistory
             modelBuilder.Entity<MedicalHistory>()
                 .HasOne(m => m.XRayScan)
                 .WithMany()
                 .HasForeignKey(m => m.XRayScanId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             //Patient
             modelBuilder.Entity<Patient>()
               .HasOne(p => p.Doctor)
