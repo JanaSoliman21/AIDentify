@@ -17,18 +17,17 @@ namespace AIDentify.Models.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // XRayScan Relationships - Enforce Rules
-
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Doctor)
                 .WithMany()
                 .HasForeignKey(x => x.DoctorId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade); 
 
             modelBuilder.Entity<XRayScan>()
                 .HasOne(x => x.Student)
                 .WithMany()
                 .HasForeignKey(x => x.StudentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade); 
 
             // QuizAttempt Relationships
             modelBuilder.Entity<QuizAttempt>()
@@ -43,7 +42,7 @@ namespace AIDentify.Models.Context
                 .HasForeignKey(x => x.QuizId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Subscription Relationship Fix
+            // Subscription
             modelBuilder.Entity<Subscription>()
                 .HasOne(s => s.Doctor)
                 .WithOne()
@@ -56,7 +55,7 @@ namespace AIDentify.Models.Context
                 .HasForeignKey<Subscription>(s => s.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Notification Relationship Fix
+            // Notification
             modelBuilder.Entity<Notification>()
                 .HasOne(s => s.Doctor)
                 .WithMany(n => n.Notifications)
@@ -69,7 +68,7 @@ namespace AIDentify.Models.Context
                 .HasForeignKey(s => s.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Payment Relationship Fix
+            // Payment
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Doctor)
                 .WithMany(d => d.Payments)
@@ -81,9 +80,23 @@ namespace AIDentify.Models.Context
                 .WithMany(s => s.Payments)
                 .HasForeignKey(p => p.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //MedicalHistory
+            modelBuilder.Entity<MedicalHistory>()
+                .HasOne(m => m.XRayScan)
+                .WithMany()
+                .HasForeignKey(m => m.XRayScanId)
+                .OnDelete(DeleteBehavior.Cascade);
+            //Patient
+            modelBuilder.Entity<Patient>()
+              .HasOne(p => p.Doctor)
+              .WithMany(d =>d.patients)
+              .HasForeignKey(p => p.DoctorId)
+              .OnDelete(DeleteBehavior.Cascade);
+
 
             base.OnModelCreating(modelBuilder);
         }
+
 
 
         public override int SaveChanges()
