@@ -34,61 +34,9 @@ namespace AIDentify.Service
                         var dbContext = scope.ServiceProvider.GetRequiredService<ContextAIDentify>();
                         var _idGenerator = scope.ServiceProvider.GetRequiredService<IdGenerator>();
 
-                        //var subscriptions = dbContext.Subscription.Include(s => s.Plan).ToList();
                         var affectedSubscriptions = dbContext.Subscription.Where(s => s.PlanId.EndsWith("Temp")).Include(s => s.Plan).ToList();
                         var subscriptionWithoutPlan = dbContext.Subscription.Where(s => s.Plan == null).ToList();
                         var tempPlans = dbContext.Plan.Where(p => p.Id.EndsWith("Temp")).ToList();
-
-                        #region Commented
-                        #region Maybe Important
-                        //var expiredSubscriptions = dbContext.Subscription
-                        //.Where(s => s.EndDate < DateTime.UtcNow && s.Status == SubscriptionStatus.Active)
-                        //.ToList();
-
-                        //if (expiredSubscriptions.Any())
-                        //{
-                        //    foreach (var subscription in expiredSubscriptions)
-                        //    {
-                        //        subscription.Status = SubscriptionStatus.Expired;
-                        //        //subscription.IsPaid = false; // Assuming you want to set IsPaid to false when expired
-                        //    }
-                        //}
-                        #endregion
-
-                        //List<Subscription> affectedSubscriptions = new List<Subscription>();
-                        //foreach (var subscription in subscriptions)
-                        //{
-                        //    if (subscription.StartDate == default || subscription.Plan == null)
-                        //        continue;
-
-                        //    if (subscription.PlanId.EndsWith("Temp"))
-                        //    {
-                        //        Console.WriteLine("Found!");
-                        //        affectedSubscriptions.Add(subscription);
-                        //    }
-
-                        #region Here
-                        //int duration = subscription.Plan.Duration;
-                        //DateTime newEndDate, warningDate;
-                        //DateTime startDate = subscription.StartDate;
-
-                        //if (duration < 12)
-                        //{
-                        //    newEndDate = startDate.AddMonths(duration);
-                        //}
-                        //else
-                        //{
-                        //    int years = duration / 12;
-                        //    int months = duration % 12;
-                        //    newEndDate = startDate.AddYears(years).AddMonths(months);
-                        //}
-
-                        //warningDate = newEndDate.AddDays(-7);
-                        //subscription.EndDate = newEndDate;
-                        //subscription.WarningDate = warningDate;
-                        #endregion
-                        //}
-                        #endregion
 
                         foreach (var subscription in affectedSubscriptions)
                         {
