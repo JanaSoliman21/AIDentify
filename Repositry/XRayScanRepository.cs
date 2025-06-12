@@ -44,6 +44,13 @@ namespace AIDentify.Repositry
                 .ToDictionaryAsync(x => x.Id);
         }
 
+        public async Task<int> CountByIdAsync(string id)
+        {
+            return await _context.XRayScan.Where(x => x.DoctorId == id || x.StudentId ==id).CountAsync();
+
+        }
+
+
         public async Task DeleteAsync(string id)
         {
             bool isUsed = await _context.MedicalHistory.AnyAsync(m => m.XRayScanId == id);

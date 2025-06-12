@@ -37,35 +37,38 @@ namespace AIDentify.Controllers
             return Ok(allPatients);
         }
 
+
+
         [HttpPost]
         public async Task<IActionResult> AddPatients([FromBody] PatientDto patientDto)
         {
-            var doctorIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var doctorNameClaim = User.FindFirst(ClaimTypes.Name);
+            var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var doctorName = User.FindFirstValue(ClaimTypes.Name);
 
-            if (doctorIdClaim == null || doctorNameClaim == null)
+            if (doctorId == null || doctorName == null)
                 return Unauthorized("Invalid token: no DoctorId found");
-
-            string doctorId = doctorIdClaim.Value;
-            string doctorName = doctorNameClaim.Value;
 
             var subscription = subscriptionRepository.GetSubscriptionByUserId(doctorId);
             if (subscription == null || subscription.Plan == null)
                 return BadRequest("Doctor does not have an active subscription.");
 
             int maxPatients = subscription.Plan.MaxPatients;
-
             int currentPatientCount = await patientRepository.CountByIdAsync(doctorId);
 
             if (currentPatientCount >= maxPatients)
                 return BadRequest("You have reached the maximum number of patients allowed in your plan.");
 
-            var xrayScanIds = patientDto.medicalHistories
-                .Select(h => h.XRayScanId)
-                .Distinct()
-                .ToList();
+            Dictionary<string, XRayScan> xrayScans = new();
+            if (patientDto.medicalHistories != null && patientDto.medicalHistories.Any())
+            {
+                var xrayScanIds = patientDto.medicalHistories
+                    .Where(h => !string.IsNullOrEmpty(h.XRayScanId))
+                    .Select(h => h.XRayScanId)
+                    .Distinct()
+                    .ToList();
 
-            var xrayScans = await xRayScanRepository.GetByIdsAsync(xrayScanIds);
+                xrayScans = await xRayScanRepository.GetByIdsAsync(xrayScanIds);
+            }
 
             var patient = new Patient
             {
@@ -75,11 +78,18 @@ namespace AIDentify.Controllers
                 gender = patientDto.Gender,
                 DoctorId = doctorId,
                 DoctorName = doctorName,
-                MedicalHistories = patientDto.medicalHistories.Select(h =>
-                {
-                    var scan = xrayScans.ContainsKey(h.XRayScanId) ? xrayScans[h.XRayScanId] : null;
+                MedicalHistories = new List<MedicalHistory>()
+            };
 
-                    return new MedicalHistory
+            if (patientDto.medicalHistories != null && patientDto.medicalHistories.Any())
+            {
+                foreach (var h in patientDto.medicalHistories)
+                {
+                    XRayScan scan = null;
+                    if (!string.IsNullOrEmpty(h.XRayScanId))
+                        xrayScans.TryGetValue(h.XRayScanId, out scan);
+
+                    patient.MedicalHistories.Add(new MedicalHistory
                     {
                         Id = id_Generator.GenerateId<MedicalHistory>(ModelPrefix.MedicalHistory),
                         Diagnosis = h.Diagnosis ?? "",
@@ -87,62 +97,16 @@ namespace AIDentify.Controllers
                         XRayScanId = h.XRayScanId,
                         TeethPrediction = scan?.TeethPrediction,
                         DiseasePrediction = scan?.DiseasePrediction
-                    };
-                }).ToList()
-            };
+                    });
+                }
+            }
 
             await patientRepository.AddAsync(patient);
             return Ok(patient);
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> AddPatients([FromBody] PatientDto patientDto)
-        //{
-        //    var doctorIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        //    var doctorNameClaim = User.FindFirst(ClaimTypes.Name);
 
-        //    if (doctorIdClaim == null || doctorNameClaim == null)
-        //        return Unauthorized("Invalid token: no DoctorId found");
-
-        //    string doctorId = doctorIdClaim.Value;
-        //    string doctorName = doctorNameClaim.Value;
-
-        //    var xrayScanIds = patientDto.medicalHistories
-        //        .Select(h => h.XRayScanId)
-        //        .Distinct()
-        //        .ToList();
-
-        //    var xrayScans = await xRayScanRepository.GetByIdsAsync(xrayScanIds);
-
-
-        //    var patient = new Patient
-        //    {
-        //        Id = id_Generator.GenerateId<Patient>(ModelPrefix.Patient),
-        //        PatientName = patientDto.PatientName,
-        //        age = patientDto.Age,
-        //        gender = patientDto.Gender,
-        //        DoctorId = doctorId,
-        //        DoctorName = doctorName,
-        //        MedicalHistories = patientDto.medicalHistories.Select(h =>
-        //        {
-        //            var scan = xrayScans.ContainsKey(h.XRayScanId) ? xrayScans[h.XRayScanId] : null;
-
-        //            return new MedicalHistory
-        //            {
-        //                Id = id_Generator.GenerateId<MedicalHistory>(ModelPrefix.MedicalHistory),
-        //                Diagnosis = h.Diagnosis ?? "", 
-        //                VisitDate = h.VisitDate,
-        //                XRayScanId = h.XRayScanId,
-        //                TeethPrediction = scan?.TeethPrediction,
-        //                DiseasePrediction = scan?.DiseasePrediction
-        //            };
-        //        }).ToList()
-        //    };
-
-        //    await patientRepository.AddAsync(patient);
-        //    return Ok(patient);
-        //}
 
         [HttpGet("SearchByName/{Name}")]
 
