@@ -125,8 +125,5 @@ namespace AIDentify.Repositry
             context.Doctor.Remove(Doctor);
             await context.SaveChangesAsync();
         }
-
-
-
     }
 }
