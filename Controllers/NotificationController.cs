@@ -1,7 +1,9 @@
 ﻿using AIDentify.ID_Generator;
 using AIDentify.IRepositry;
 using AIDentify.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AIDentify.Controllers
 {
@@ -20,6 +22,7 @@ namespace AIDentify.Controllers
 
         #region Get All Notifications
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Notification?>> GetAllNotifications()
         {
             return Ok(_notificationRepository.GetAllNotifications());
@@ -27,9 +30,21 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Get Notifications by User Id
-        [HttpGet("byUser/{userId}")]
-        public ActionResult<List<Notification?>> GetNotificationsByUserId(string userId)
+        [HttpGet("byUser")]
+        [Authorize]
+        public ActionResult<List<Notification?>> GetNotificationsByUserId()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             if (string.IsNullOrEmpty(userId))
             {
                 return BadRequest("User ID cannot be null or empty.");
@@ -40,6 +55,7 @@ namespace AIDentify.Controllers
 
         #region Get Notification by Id
         [HttpGet("notification/{id}")]
+        [Authorize]
         public ActionResult<Notification?> GetNotification(string id)
         {
             var notification = _notificationRepository.GetNotification(id);
@@ -52,7 +68,8 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Add Notification
-        [HttpPost("{userId}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult AddNotification([FromBody] string notificationContent, string userId)
         {
             Notification notification = new Notification
@@ -69,6 +86,7 @@ namespace AIDentify.Controllers
 
         #region Mark Notification as Seen
         [HttpPut("seen/{id}")]
+        [Authorize]
         public ActionResult MarkNotificationAsSeen(string id)
         {
             var notification = _notificationRepository.GetNotification(id);
@@ -83,6 +101,7 @@ namespace AIDentify.Controllers
 
         #region Update Notification
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateNotification([FromBody] string notificationNewContent, string id)
         {
             Notification notification = new Notification
@@ -97,6 +116,7 @@ namespace AIDentify.Controllers
 
         #region Delete Notification by Id
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult DeleteNotification(string id)
         {
             var notification = _notificationRepository.GetNotification(id);
@@ -110,9 +130,21 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Delete All Notifications for a User
-        [HttpDelete("user/{userId}")]
-        public ActionResult DeleteAllNotificationsByUserId(string userId)
+        [HttpDelete]
+        [Authorize]
+        public ActionResult DeleteAllNotificationsByUserId()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             _notificationRepository.DeleteAllNotificationsByUserId(userId);
             return Ok("All Deleted Successfully");
         }

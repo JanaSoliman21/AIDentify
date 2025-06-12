@@ -2,14 +2,16 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AIDentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="Admin")]
+    [Authorize(Roles ="Admin")]
     public class SystemUpdateController : ControllerBase
     {
         private readonly ISystemUpdateRepository _systemUpdateRepository;
@@ -38,9 +40,20 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Get All for this Admin
-        [HttpGet("admin/{adminId}")]
-        public IActionResult GetAllForAdmin(string adminId)
+        [HttpGet("admin")]
+        public IActionResult GetAllForAdmin()
         {
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             return Ok(_systemUpdateRepository.GetAllSystemUpdateByAdminId(adminId));
         }
         #endregion
@@ -79,9 +92,20 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Delete All for this Admin
-        [HttpDelete("all/{adminId}")]
-        public IActionResult DeleteAll(string adminId)
+        [HttpDelete("all")]
+        public IActionResult DeleteAll()
         {
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             _systemUpdateRepository.DeleteAllSystemUpdateForThisAdmin(adminId);
             return Ok("All Deleted Successfully");
         }

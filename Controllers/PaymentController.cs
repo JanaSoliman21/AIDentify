@@ -2,7 +2,9 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AIDentify.Controllers
 {
@@ -27,9 +29,21 @@ namespace AIDentify.Controllers
 
         #region Get All Payments for this User
 
-        [HttpGet("{userId}")]
-        public ActionResult<List<Payment>> GetAll(string userId)
+        [HttpGet]
+        [Authorize]
+        public ActionResult<List<Payment>> GetAll()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var payments = _paymentRepository.GetAll(userId);
             if (payments == null || !payments.Any())
             {
@@ -42,9 +56,21 @@ namespace AIDentify.Controllers
 
         #region Get a Specific Payment by ID for this User
 
-        [HttpGet("user/{userId}/payment/{id}")]
-        public ActionResult<Payment> Get(string userId, string id)
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<Payment> Get(string id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var payment = _paymentRepository.Get(userId, id);
             if (payment == null)
             {
@@ -57,11 +83,23 @@ namespace AIDentify.Controllers
 
         #region Update an Existing Payment for this User
 
-        [HttpPut("user/{userId}/payment/{id}")]
-        public ActionResult Update(string userId, string id, [FromBody] Payment payment)
+        [HttpPut("{id}")]
+        [Authorize]
+        public ActionResult Update(string id, [FromBody] Payment payment)
         {
             try
             {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized("Invalid Token: User ID not found in claims");
+                }
+                var userId = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("User ID is required");
+                }
+
                 // Find the existing payment
                 var existingPayment = _paymentRepository.Get(userId, id);
                 if (existingPayment == null)
@@ -110,11 +148,23 @@ namespace AIDentify.Controllers
 
         #region Delete a Payment for this User
 
-        [HttpDelete("user/{userId}/payment/{id}")]
-        public ActionResult Delete(string userId, string paymentId)
+        [HttpDelete("{id}")]
+        [Authorize]
+        public ActionResult Delete(string paymentId)
         {
             try
             {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized("Invalid Token: User ID not found in claims");
+                }
+                var userId = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("User ID is required");
+                }
+
                 // Find the existing payment
                 var payment = _paymentRepository.Get(userId, paymentId);
                 if (payment == null)
@@ -161,6 +211,7 @@ namespace AIDentify.Controllers
         #region Admin fetches all pending payments
 
         [HttpGet("pending")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetPendingPayments()
         {
             var pendingPayments = _paymentRepository.GetPendingPayments();
@@ -171,10 +222,20 @@ namespace AIDentify.Controllers
 
         #region Admin approves or rejects a payment
 
-        [HttpPut("update-status/{adminId}/{paymentId}")]
-        public IActionResult UpdatePaymentStatus(string adminId, string paymentId, [FromBody] string status)
+        [HttpPut("update-status/{paymentId}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult UpdatePaymentStatus(string paymentId, [FromBody] string status)
         {
-            //checking admin ...
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("User ID is required");
+            }
 
             if (string.IsNullOrEmpty(status))
             {

@@ -23,6 +23,7 @@ namespace AIDentify.Models
 
         [ValidateNever]
         [ForeignKey(nameof(AdminId))]
+        [JsonIgnore]
         public Admin? Admin { get; set; }
     }
 }

@@ -2,7 +2,9 @@
 using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AIDentify.Controllers
 {
@@ -28,6 +30,7 @@ namespace AIDentify.Controllers
         #region Get All Quiz Attempts
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<QuizAttempt>> GetAll()
         {
             var quizAttempts = _quizAttemptRepository.GetAll();
@@ -56,9 +59,20 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Get Quiz Attempts by Student ID
-        [HttpGet("student/{studentId}")]
-        public ActionResult<List<QuizAttempt>> GetAllMyAttempts(string studentId)
+        [HttpGet("student")]
+        public ActionResult<List<QuizAttempt>> GetAllMyAttempts()
         {
+            var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (studentIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var studentId = studentIdClaim.Value;
+            if (string.IsNullOrEmpty(studentId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var quizAttempts = _quizAttemptRepository.GetByStudentId(studentId);
             if (quizAttempts == null || !quizAttempts.Any())
             {
@@ -90,9 +104,20 @@ namespace AIDentify.Controllers
 
         #region Start a Quiz Attempts by Student ID
 
-        [HttpPost("start/{studentId}/{quizId}")]
-        public IActionResult StartQuiz(string studentId, string quizId, [FromBody] List<string> answers)
+        [HttpPost("start/{quizId}")]
+        public IActionResult StartQuiz(string quizId, [FromBody] List<string> answers)
         {
+            var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (studentIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var studentId = studentIdClaim.Value;
+            if (string.IsNullOrEmpty(studentId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var quiz = _quizRepository.GetById(quizId);
             if (quiz == null)
             {

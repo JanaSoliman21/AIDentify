@@ -4,7 +4,9 @@ using AIDentify.IRepositry;
 using AIDentify.Models;
 using AIDentify.Models.Context;
 using AIDentify.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -12,7 +14,6 @@ namespace AIDentify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
     public class SubscriptionController : ControllerBase
     {
         private readonly ISubscriptionRepository SubscriptionRepository;
@@ -37,6 +38,7 @@ namespace AIDentify.Controllers
         #region Get All
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAll()
         {
             return Ok(SubscriptionRepository.GetAllSubscriptions());
@@ -62,9 +64,21 @@ namespace AIDentify.Controllers
 
         #region Get by User
 
-        [HttpGet("user={userId}")]
-        public IActionResult GetByUser(string userId)
+        [HttpGet("user")]
+        [Authorize]
+        public IActionResult GetByUser()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var subscription = SubscriptionRepository.GetSubscriptionByUserId(userId);
             if (subscription == null)
             {
@@ -79,6 +93,7 @@ namespace AIDentify.Controllers
         #region Update Subscription
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update(string id, [FromBody] SubscriptionPaymentDto subscriptionPayment)
         {
             var payment = subscriptionPayment.Payment;
@@ -186,7 +201,7 @@ namespace AIDentify.Controllers
                         "application/json"
                     );
 
-                    var response = AddPaymentToExistingSubscription(existingSubscription.StudentId ?? existingSubscription.DoctorId, payment, existingSubscription.PlanId);
+                    var response = AddPaymentToExistingSubscription(payment, existingSubscription.PlanId, existingSubscription.StudentId ?? existingSubscription.DoctorId);
 
                     if (response is BadRequestObjectResult badRequestResult)
                     {
@@ -235,9 +250,21 @@ namespace AIDentify.Controllers
 
         #region Create a Payment for the first time for a Subscription that doesn't exist
 
-        [HttpPost("new/user={userId}")]
-        public IActionResult AddPaymentToANewSubscription(string userId, [FromBody] SubscriptionPaymentDto subscriptionPayment)
+        [HttpPost("new")]
+        [Authorize]
+        public IActionResult AddPaymentToANewSubscription([FromBody] SubscriptionPaymentDto subscriptionPayment)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             // check if the user's subscription already exists
             if (SubscriptionRepository.GetSubscriptionByUserId(userId) != null)
             {
@@ -303,9 +330,30 @@ namespace AIDentify.Controllers
 
         #region Create a Payment for a Subscription that already exists
 
-        [HttpPost("existing/user={userId}")]
-        public IActionResult AddPaymentToExistingSubscription(string userId, [FromBody] Payment payment, string newPlanId = "")
+        [HttpPost("existing")]
+        [Authorize]
+        public IActionResult AddPaymentToExistingSubscription([FromBody] Payment payment, string newPlanId = "", string userFromUpdateFunction = "")
         {
+            var userId = "";
+            if (userFromUpdateFunction == "")
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized("Invalid Token: User ID not found in claims");
+                }
+                userId = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("User ID is required");
+                }
+            }
+            else
+            {
+                // Use the userId from the update function
+                userId = userFromUpdateFunction;
+            }
+
             // get the user's subscription
             Subscription subscription = SubscriptionRepository.GetSubscriptionByUserId(userId);
             if (subscription == null)
@@ -382,9 +430,21 @@ namespace AIDentify.Controllers
 
         #region Access Subscription by UserId
 
-        [HttpGet("access/{userId}")]
-        public IActionResult AccessSubscription(string userId)
+        [HttpGet("access")]
+        [Authorize]
+        public IActionResult AccessSubscription()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var subscription = SubscriptionRepository.GetSubscriptionByUserId(userId);
             if (subscription == null)
             {
