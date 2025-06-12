@@ -148,7 +148,7 @@ namespace AIDentify.Controllers
 
         #region Delete a Payment for this User
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{paymentId}")]
         [Authorize]
         public ActionResult Delete(string paymentId)
         {

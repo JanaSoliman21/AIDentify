@@ -60,6 +60,7 @@ namespace AIDentify.Controllers
 
         #region Get Quiz Attempts by Student ID
         [HttpGet("student")]
+        [Authorize(Roles = "Student")]
         public ActionResult<List<QuizAttempt>> GetAllMyAttempts()
         {
             var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -85,13 +86,31 @@ namespace AIDentify.Controllers
         #region Delete Quiz Attempt
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Student")]
         public IActionResult Delete(string id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var existingQuizAttempt = _quizAttemptRepository.GetById(id);
             if (existingQuizAttempt == null)
             {
                 return NotFound("Quiz attempt not found.");
             }
+
+            if (existingQuizAttempt.StudentId != userId)
+            {
+                return Forbid("You are not authorized to delete this quiz attempt.");
+            }
+
             _quizAttemptRepository.Delete(existingQuizAttempt);
             return Ok("Deleted Successfully");
         }

@@ -230,12 +230,30 @@ namespace AIDentify.Controllers
         #region Delete a Subscription
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(string id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var userId = userIdClaim.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var existingSubscription = SubscriptionRepository.GetSubscription(id);
             if (existingSubscription == null)
             {
                 return NotFound("Subscription not found.");
+            }
+
+            // Check if the user has permission to delete the subscription
+            if (existingSubscription.StudentId != userId && existingSubscription.DoctorId != userId)
+            {
+                return Forbid("You do not have permission to delete this subscription.");
             }
 
             SubscriptionRepository.DeleteSubscription(existingSubscription);

@@ -68,7 +68,7 @@ namespace AIDentify.Controllers
         #endregion
 
         #region Add Notification
-        [HttpPost]
+        [HttpPost("{userId}")]
         [Authorize(Roles = "Admin")]
         public ActionResult AddNotification([FromBody] string notificationContent, string userId)
         {

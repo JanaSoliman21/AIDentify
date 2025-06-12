@@ -131,7 +131,7 @@ namespace AIDentify.Controllers
 
         #endregion
 
-        #region Add Questions to an Existing Quiz
+        #region Create Questions to an Existing Quiz
 
         [HttpPost("{id}/questions")]
         [Authorize(Roles = "Admin")]

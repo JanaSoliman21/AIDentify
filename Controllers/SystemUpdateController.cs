@@ -81,10 +81,25 @@ namespace AIDentify.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (adminIdClaim == null)
+            {
+                return Unauthorized("Invalid Token: User ID not found in claims");
+            }
+            var adminId = adminIdClaim.Value;
+            if (string.IsNullOrEmpty(adminId))
+            {
+                return BadRequest("User ID is required");
+            }
+
             var systemUpdate = _systemUpdateRepository.GetSystemUpdate(id);
             if (systemUpdate != null)
             {
-                 _systemUpdateRepository.DeleteSystemUpdate(systemUpdate);
+                if (systemUpdate.AdminId != adminId)
+                {
+                    return Unauthorized("You are not authorized to delete this system update");
+                }
+                _systemUpdateRepository.DeleteSystemUpdate(systemUpdate);
                 return Ok("Deleted Successfully");
             }
             return BadRequest("System Update Doesn't Exist");
