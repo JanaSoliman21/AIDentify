@@ -255,10 +255,77 @@ namespace AIDentify.Controllers
             return Ok(new
             {
                 message = "Prediction stored successfully",
-                predictionResult
+                predictionResult,
+                xRayScan.Id
             });
 
         }
+
+        //[HttpPost("predict_Disease")]
+        //public async Task<IActionResult> PredictDisease([FromForm] ModelsDto request)
+        //{
+        //    var pythonApiUrl = "https://amrgamal11-project-api.hf.space/detect-disease";
+
+        //    if (request.File == null || request.File.Length == 0)
+        //    {
+        //        return BadRequest("No file uploaded.");
+        //    }
+
+        //    using var memoryStream = new MemoryStream();
+        //    await request.File.CopyToAsync(memoryStream);
+        //    byte[] fileBytes = memoryStream.ToArray();
+
+        //    var imageContent = new ByteArrayContent(fileBytes);
+        //    imageContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("image/jpeg");
+
+        //    var form = new MultipartFormDataContent();
+        //    form.Add(imageContent, "file", request.File.FileName);
+
+        //    HttpResponseMessage response;
+        //    try
+        //    {
+        //        response = await _httpClient.PostAsync(pythonApiUrl, form);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Error calling the detection API: {ex.Message}");
+        //    }
+
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        var errorMsg = await response.Content.ReadAsStringAsync();
+        //        return BadRequest($"API Error: {(int)response.StatusCode} - {errorMsg}");
+        //    }
+
+        //    var resultBytes = await response.Content.ReadAsByteArrayAsync();
+
+        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        //    string userId = userIdClaim.Value;
+        //    var userRoleClaim = User.FindFirst(ClaimTypes.Role);
+        //    string userRole = userRoleClaim.Value;
+
+        //    var xRayScan = new XRayScan
+        //    {
+        //        Id = id_Generator.GenerateId<XRayScan>(ModelPrefix.XRayScan),
+        //        ImagePath = request.File.FileName,
+        //        ScanDate = DateTime.UtcNow
+        //    };
+
+        //    if (userRole == "Student")
+        //    {
+        //        xRayScan.StudentId = userId;
+        //    }
+        //    if (userRole == "Doctor")
+        //    {
+        //        xRayScan.DoctorId = userId;
+
+        //    }
+        //    await xRayScanRepository.AddAsync(xRayScan);
+
+        //    return File(resultBytes, "image/jpeg");
+
+
+        //}
 
         [HttpPost("predict_Disease")]
         public async Task<IActionResult> PredictDisease([FromForm] ModelsDto request)
@@ -298,31 +365,32 @@ namespace AIDentify.Controllers
 
             var resultBytes = await response.Content.ReadAsByteArrayAsync();
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            string userId = userIdClaim.Value;
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            string userRole = userRoleClaim.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
             var xRayScan = new XRayScan
             {
                 Id = id_Generator.GenerateId<XRayScan>(ModelPrefix.XRayScan),
                 ImagePath = request.File.FileName,
-                ScanDate = DateTime.UtcNow
+                ScanDate = DateTime.UtcNow,
+                DoctorId = userRole == "Doctor" ? userId : null,
+                StudentId = userRole == "Student" ? userId : null,
+
+                // أضف الصورة الناتجة هنا
+                DiseasePrediction = resultBytes
             };
 
-            if (userRole == "Student")
-            {
-                xRayScan.StudentId = userId;
-            }
-            if (userRole == "Doctor")
-            {
-                xRayScan.DoctorId = userId;
-
-            }
             await xRayScanRepository.AddAsync(xRayScan);
 
-            return File(resultBytes, "image/jpeg");
+            var result = new
+            {
+                Id = xRayScan.Id,
+                ImageBase64 = Convert.ToBase64String(resultBytes)
+            };
+
+            return Ok(result);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)

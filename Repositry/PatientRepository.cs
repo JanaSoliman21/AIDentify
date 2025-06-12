@@ -8,6 +8,7 @@ namespace AIDentify.Repositry
     public class PatientRepository : IPatientRepository
     {
         private readonly ContextAIDentify context;
+
         public PatientRepository(ContextAIDentify context)
         {
             this.context = context;
@@ -60,6 +61,11 @@ namespace AIDentify.Repositry
             context.Patient.Remove(patientToDelete);
             await context.SaveChangesAsync();
 
+        }
+
+        public async Task<int> CountByIdAsync(string id)
+        {
+           return await context.Patient.Where(d=>d.DoctorId == id).CountAsync(); 
         }
     }
 }

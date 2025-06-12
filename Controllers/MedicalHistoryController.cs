@@ -62,36 +62,88 @@ namespace AIDentify.Controllers
             return Ok(medicalResult);
         }
 
+       // [HttpPost("from-scan")]
+        //public async Task<IActionResult> CreateFromScan([FromBody] CreateHistoryFromScanDto createHistoryFromScanDto)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    var scan = await xray.GetByIdAsync(createHistoryFromScanDto.ScanId);
+        //    if (scan == null)
+        //        return NotFound("X-Ray scan not found.");
+
+        //    if (scan.DoctorId != userId)
+        //        return StatusCode(StatusCodes.Status403Forbidden, "You are not allowed to add medical history for this scan.");
+
+        //    var patientEntity = await patient.GetByIdAsync(createHistoryFromScanDto.PatientId);
+        //    if (patientEntity == null || patientEntity.DoctorId != userId)
+        //        return BadRequest("Invalid or unauthorized patient.");
+
+        //    var history = new MedicalHistory
+        //    {
+        //        Id = id_Generator.GenerateId<MedicalHistory>(ModelPrefix.MedicalHistory),
+        //        XRayScanId = createHistoryFromScanDto.ScanId,
+        //        PatientId = createHistoryFromScanDto.PatientId,
+        //        TeethPrediction = scan.TeethPrediction,
+        //        DiseasePrediction = scan.DiseasePrediction,
+        //        Diagnosis = "Auto-generated from X-Ray Scan",
+        //        VisitDate = DateTime.Now
+        //    };
+
+        //    await medical.AddAsync(history);
+        //    return Ok(history);
+        //}
         [HttpPost("from-scan")]
-        public async Task<IActionResult> CreateFromScan([FromBody] CreateHistoryFromScanDto createHistoryFromScanDto)
+        public async Task<IActionResult> CreateFromScan([FromForm] CreateHistoryFromScanDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var scan = await xray.GetByIdAsync(createHistoryFromScanDto.ScanId);
-            if (scan == null)
-                return NotFound("X-Ray scan not found.");
+            byte[] diseasePrediction = null;
+            string teethPrediction = null;
 
-            if (scan.DoctorId != userId)
-                return StatusCode(StatusCodes.Status403Forbidden, "You are not allowed to add medical history for this scan.");
+            if (!string.IsNullOrEmpty(dto.ScanId))
+            {
+                var scan = await xray.GetByIdAsync(dto.ScanId);
+                if (scan == null)
+                    return NotFound("Scan not found.");
 
-            var patientEntity = await patient.GetByIdAsync(createHistoryFromScanDto.PatientId);
+                if (scan.DoctorId != userId)
+                    return StatusCode(StatusCodes.Status403Forbidden, "You are not allowed to use this scan.");
+
+                diseasePrediction = scan.DiseasePrediction;
+                teethPrediction = scan.TeethPrediction;
+            }
+            else
+            {
+                if (dto.Prediction == null || dto.Prediction.Length == 0)
+                    return BadRequest("Prediction image is required.");
+
+                using var memoryStream = new MemoryStream();
+                await dto.Prediction.CopyToAsync(memoryStream);
+                diseasePrediction = memoryStream.ToArray();
+
+                teethPrediction = dto.teeth;
+            }
+
+            var patientEntity = await patient.GetByIdAsync(dto.PatientId);
             if (patientEntity == null || patientEntity.DoctorId != userId)
                 return BadRequest("Invalid or unauthorized patient.");
 
             var history = new MedicalHistory
             {
                 Id = id_Generator.GenerateId<MedicalHistory>(ModelPrefix.MedicalHistory),
-                XRayScanId = createHistoryFromScanDto.ScanId,
-                PatientId = createHistoryFromScanDto.PatientId,
-                TeethPrediction = scan.TeethPrediction,
-                DiseasePrediction = scan.DiseasePrediction,
-                Diagnosis = "Auto-generated from X-Ray Scan",
+                XRayScanId = dto.ScanId,
+                PatientId = dto.PatientId,
+                TeethPrediction = teethPrediction,
+                DiseasePrediction = diseasePrediction,
+                Diagnosis = dto.Diagnosis,
                 VisitDate = DateTime.Now
             };
 
             await medical.AddAsync(history);
+
             return Ok(history);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)

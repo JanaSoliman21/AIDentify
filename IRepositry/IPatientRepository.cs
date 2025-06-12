@@ -10,5 +10,6 @@ namespace AIDentify.IRepositry
         Task<List<Patient>> GetByNameAsync(string name);
         Task<Patient> UpdateAsync(Patient patient);
         Task DeleteAsync(Patient patient);
+        Task<int> CountByIdAsync(string id);
     }
 }
