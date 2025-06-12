@@ -28,7 +28,7 @@ namespace AIDentify.Controllers
         public async Task<IActionResult> GetAllDoctors()
         {
 
-            var doctors = userRepository.GetAllDoctorsAsync();
+            var doctors = await userRepository.GetAllDoctorsAsync();
             return Ok(doctors);
         }
 
@@ -37,7 +37,7 @@ namespace AIDentify.Controllers
         public async Task<IActionResult> GetAllStudents()
         {
 
-            var students = userRepository.GetAllStudentsAsync();
+            var students = await userRepository.GetAllStudentsAsync();
             return Ok(students);
         }
 
@@ -46,7 +46,7 @@ namespace AIDentify.Controllers
         public async Task<IActionResult> GetAllAdmins()
         {
 
-            var admins = userRepository.GetAllAdminsAsync();
+            var admins = await userRepository.GetAllAdminsAsync();
             return Ok(admins);
         }
 

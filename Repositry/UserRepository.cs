@@ -16,11 +16,11 @@ namespace AIDentify.Repositry
         }
         public async Task<List<Doctor>> GetAllDoctorsAsync()
         {
-            return await context.Doctor.Include(d => d.SubscriptionId).ToListAsync(); ;
+            return await context.Doctor.Include(d => d.Subscription).ToListAsync(); ;
         }
         public async Task<List<Student>> GetAllStudentsAsync()
         {
-            return await context.Student.Include(d => d.SubscriptionId).ToListAsync();
+            return await context.Student.Include(d => d.Subscription).ToListAsync();
 
         }
         public async Task<List<Admin>> GetAllAdminsAsync()
