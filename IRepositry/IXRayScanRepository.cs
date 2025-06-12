@@ -10,5 +10,6 @@ namespace AIDentify.IRepositry
         Task UpdateAsync(XRayScan xRayScan);
         Task<Dictionary<string, XRayScan>> GetByIdsAsync(List<string> xrayScanIds);
         Task DeleteAsync(string id);
+        Task<int> CountByIdAsync(string id);
     }
 }

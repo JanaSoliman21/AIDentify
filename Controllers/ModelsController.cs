@@ -4,9 +4,12 @@ using AIDentify.DTO;
 using AIDentify.ID_Generator;
 using AIDentify.IRepositry;
 using AIDentify.Models;
+using AIDentify.Models.Context;
 using AIDentify.Models.Enums;
+using AIDentify.Repositry;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AIDentify.Controllers
@@ -20,14 +23,18 @@ namespace AIDentify.Controllers
         private readonly IdGenerator id_Generator;
         private readonly HttpClient _httpClient;
         private readonly IXRayScanRepository xRayScanRepository;
+        private readonly ISubscriptionRepository subscriptionRepository;
 
-        public ModelsController(HttpClient httpClient, ILogger<ModelsController> logger, IdGenerator id_Generator, IXRayScanRepository xRayScanRepository)
+        public ModelsController(HttpClient httpClient, ILogger<ModelsController> logger, IdGenerator id_Generator, ISubscriptionRepository subscriptionRepository, IXRayScanRepository xRayScanRepository)
         {
             _httpClient = httpClient;
              this.id_Generator = id_Generator;
             _logger = logger;
             this.xRayScanRepository = xRayScanRepository;
+            this.subscriptionRepository = subscriptionRepository;
         }
+
+       
 
         [HttpPost("predict_Age")]
         public async Task<IActionResult> PredictAge([FromForm] ModelsDto request)
@@ -38,6 +45,27 @@ namespace AIDentify.Controllers
             {
                 return BadRequest("No file uploaded.");
             }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            string userId = userIdClaim.Value;
+            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
+            string userRole = userRoleClaim.Value;
+
+            var subscription = subscriptionRepository.GetSubscriptionByUserId(userId);
+            if (subscription == null || subscription.Plan == null)
+            {
+                return BadRequest("No subscription found for this user.");
+            }
+
+            int maxScans = subscription.Plan.MaxScans;
+
+            int scanCount = await xRayScanRepository.CountByIdAsync(userId);
+
+            if (scanCount >= maxScans)
+            {
+                return BadRequest($"You have reached the maximum allowed scans for your plan ({maxScans}).");
+            }
+
             byte[] fileBytes;
             using (var ms = new MemoryStream())
             {
@@ -50,27 +78,22 @@ namespace AIDentify.Controllers
             var form = new MultipartFormDataContent();
             form.Add(fileContent, "file", request.File.FileName);
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            string userId = userIdClaim.Value;
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            string userRole = userRoleClaim.Value;
-
             var xRayScan = new XRayScan
             {
                 Id = id_Generator.GenerateId<XRayScan>(ModelPrefix.XRayScan),
                 ImagePath = request.File.FileName,
                 ScanDate = DateTime.UtcNow
             };
-            
+
             if (userRole == "Student")
             {
                 xRayScan.StudentId = userId;
             }
-            if (userRole == "Doctor")
+            else if (userRole == "Doctor")
             {
                 xRayScan.DoctorId = userId;
-
             }
+
             await xRayScanRepository.AddAsync(xRayScan);
 
             var response = await _httpClient.PostAsync(pythonApiUrl, form);
@@ -79,30 +102,31 @@ namespace AIDentify.Controllers
                 var errMsg = await response.Content.ReadAsStringAsync();
                 return BadRequest($"Error calling the age prediction API: {errMsg}");
             }
-            var responseString = await response.Content.ReadAsStringAsync();
 
+            var responseString = await response.Content.ReadAsStringAsync();
             var predictionResult = JsonSerializer.Deserialize<Dictionary<string, string>>(responseString);
             if (predictionResult == null || !predictionResult.ContainsKey("age_group"))
-                {
-                    return BadRequest("Invalid response from AI model.");
-                }
-                if (Enum.TryParse(predictionResult["age_group"], out Age predictedAge))
-                {
-                    xRayScan.PredictedAgeGroup = predictedAge;
-                     await xRayScanRepository.UpdateAsync(xRayScan);
-                }
-                else
-                {
-                    return BadRequest("Failed to parse Age prediction.");
-
-                }
-                return Ok(new
-                {
-                    message = "Prediction stored successfully",
-                    predictedAge
-                });
-
+            {
+                return BadRequest("Invalid response from AI model.");
             }
+
+            if (Enum.TryParse(predictionResult["age_group"], out Age predictedAge))
+            {
+                xRayScan.PredictedAgeGroup = predictedAge;
+                await xRayScanRepository.UpdateAsync(xRayScan);
+            }
+            else
+            {
+                return BadRequest("Failed to parse Age prediction.");
+            }
+
+            return Ok(new
+            {
+                message = "Prediction stored successfully",
+                predictedAge
+            });
+        }
+
 
         [HttpPost("predict_Gender")]
         public async Task<IActionResult> PredictGender([FromForm] ModelsDto request)
@@ -117,24 +141,35 @@ namespace AIDentify.Controllers
 
             _logger.LogInformation("Received file for gender prediction: {FileName}, File Size: {FileSize} bytes", request.File.FileName, request.File.Length);
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            var subscription = subscriptionRepository.GetSubscriptionByUserId(userId);
+            if (subscription == null || subscription.Plan == null)
+            {
+                return BadRequest("No subscription found for this user.");
+            }
+
+            int maxScans = subscription.Plan.MaxScans;
+            int scanCount = await xRayScanRepository.CountByIdAsync(userId);
+
+            if (scanCount >= maxScans)
+            {
+                return BadRequest($"You have reached the maximum allowed scans for your plan ({maxScans}).");
+            }
+
             byte[] fileBytes;
             using (var ms = new MemoryStream())
             {
                 await request.File.CopyToAsync(ms);
                 fileBytes = ms.ToArray();
             }
+
             var fileContent = new ByteArrayContent(fileBytes);
-            fileContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("image/jpeg");
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
 
             var form = new MultipartFormDataContent();
             form.Add(fileContent, "file", request.File.FileName);
-
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            string userId = userIdClaim.Value;
-            var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-            string userRole = userRoleClaim.Value;
-
-
 
             var xRayScan = new XRayScan
             {
@@ -144,14 +179,10 @@ namespace AIDentify.Controllers
             };
 
             if (userRole == "Student")
-            {
                 xRayScan.StudentId = userId;
-            }
-            if (userRole == "Doctor")
-            {
+            else if (userRole == "Doctor")
                 xRayScan.DoctorId = userId;
 
-            }
             await xRayScanRepository.AddAsync(xRayScan);
 
             var response = await _httpClient.PostAsync(pythonApiUrl, form);
@@ -171,8 +202,7 @@ namespace AIDentify.Controllers
                 return BadRequest("Invalid response from AI model.");
             }
 
-            Gender predictedGender;
-            if (Enum.TryParse(predictionResult["gender"], out predictedGender))
+            if (Enum.TryParse(predictionResult["gender"], out Gender predictedGender))
             {
                 xRayScan.PredictedGenderGroup = predictedGender;
                 await xRayScanRepository.UpdateAsync(xRayScan);
@@ -190,6 +220,7 @@ namespace AIDentify.Controllers
                 predictedGender
             });
         }
+
 
         [HttpPost("predict_Teeth")]
         public async Task<IActionResult> PredictTeeth([FromForm] ModelsDto request)
@@ -261,72 +292,7 @@ namespace AIDentify.Controllers
 
         }
 
-        //[HttpPost("predict_Disease")]
-        //public async Task<IActionResult> PredictDisease([FromForm] ModelsDto request)
-        //{
-        //    var pythonApiUrl = "https://amrgamal11-project-api.hf.space/detect-disease";
-
-        //    if (request.File == null || request.File.Length == 0)
-        //    {
-        //        return BadRequest("No file uploaded.");
-        //    }
-
-        //    using var memoryStream = new MemoryStream();
-        //    await request.File.CopyToAsync(memoryStream);
-        //    byte[] fileBytes = memoryStream.ToArray();
-
-        //    var imageContent = new ByteArrayContent(fileBytes);
-        //    imageContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("image/jpeg");
-
-        //    var form = new MultipartFormDataContent();
-        //    form.Add(imageContent, "file", request.File.FileName);
-
-        //    HttpResponseMessage response;
-        //    try
-        //    {
-        //        response = await _httpClient.PostAsync(pythonApiUrl, form);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Error calling the detection API: {ex.Message}");
-        //    }
-
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        var errorMsg = await response.Content.ReadAsStringAsync();
-        //        return BadRequest($"API Error: {(int)response.StatusCode} - {errorMsg}");
-        //    }
-
-        //    var resultBytes = await response.Content.ReadAsByteArrayAsync();
-
-        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        //    string userId = userIdClaim.Value;
-        //    var userRoleClaim = User.FindFirst(ClaimTypes.Role);
-        //    string userRole = userRoleClaim.Value;
-
-        //    var xRayScan = new XRayScan
-        //    {
-        //        Id = id_Generator.GenerateId<XRayScan>(ModelPrefix.XRayScan),
-        //        ImagePath = request.File.FileName,
-        //        ScanDate = DateTime.UtcNow
-        //    };
-
-        //    if (userRole == "Student")
-        //    {
-        //        xRayScan.StudentId = userId;
-        //    }
-        //    if (userRole == "Doctor")
-        //    {
-        //        xRayScan.DoctorId = userId;
-
-        //    }
-        //    await xRayScanRepository.AddAsync(xRayScan);
-
-        //    return File(resultBytes, "image/jpeg");
-
-
-        //}
-
+       
         [HttpPost("predict_Disease")]
         public async Task<IActionResult> PredictDisease([FromForm] ModelsDto request)
         {
@@ -334,15 +300,38 @@ namespace AIDentify.Controllers
 
             if (request.File == null || request.File.Length == 0)
             {
+                _logger.LogError("No file uploaded.");
                 return BadRequest("No file uploaded.");
             }
 
-            using var memoryStream = new MemoryStream();
-            await request.File.CopyToAsync(memoryStream);
-            byte[] fileBytes = memoryStream.ToArray();
+            _logger.LogInformation("Received file for disease prediction: {FileName}, File Size: {FileSize} bytes", request.File.FileName, request.File.Length);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            var subscription = subscriptionRepository.GetSubscriptionByUserId(userId);
+            if (subscription == null || subscription.Plan == null)
+            {
+                return BadRequest("No subscription found for this user.");
+            }
+
+            int maxScans = subscription.Plan.MaxScans;
+            int scanCount = await xRayScanRepository.CountByIdAsync(userId);
+
+            if (scanCount >= maxScans)
+            {
+                return BadRequest($"You have reached the maximum allowed scans for your plan ({maxScans}).");
+            }
+
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
+            {
+                await request.File.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
+            }
 
             var imageContent = new ByteArrayContent(fileBytes);
-            imageContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("image/jpeg");
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
 
             var form = new MultipartFormDataContent();
             form.Add(imageContent, "file", request.File.FileName);
@@ -354,42 +343,44 @@ namespace AIDentify.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError("Exception when calling the disease prediction API: {Message}", ex.Message);
                 return StatusCode(500, $"Error calling the detection API: {ex.Message}");
             }
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorMsg = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Disease prediction API returned error: {Error}", errorMsg);
                 return BadRequest($"API Error: {(int)response.StatusCode} - {errorMsg}");
             }
 
             var resultBytes = await response.Content.ReadAsByteArrayAsync();
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
             var xRayScan = new XRayScan
             {
                 Id = id_Generator.GenerateId<XRayScan>(ModelPrefix.XRayScan),
                 ImagePath = request.File.FileName,
                 ScanDate = DateTime.UtcNow,
-                DoctorId = userRole == "Doctor" ? userId : null,
-                StudentId = userRole == "Student" ? userId : null,
-
-                // أضف الصورة الناتجة هنا
                 DiseasePrediction = resultBytes
             };
 
+            if (userRole == "Doctor")
+                xRayScan.DoctorId = userId;
+            else if (userRole == "Student")
+                xRayScan.StudentId = userId;
+
             await xRayScanRepository.AddAsync(xRayScan);
 
-            var result = new
+            _logger.LogInformation("Disease prediction successful for scan {ScanId}", xRayScan.Id);
+
+            return Ok(new
             {
+                message = "Prediction stored successfully",
                 Id = xRayScan.Id,
                 ImageBase64 = Convert.ToBase64String(resultBytes)
-            };
-
-            return Ok(result);
+            });
         }
+
 
 
         [HttpDelete("{id}")]
