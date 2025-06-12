@@ -4,6 +4,7 @@ using AIDentify.Models.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIDentify.Migrations
 {
     [DbContext(typeof(ContextAIDentify))]
-    partial class ContextAIDentifyModelSnapshot : ModelSnapshot
+    [Migration("20250611220112_UpdateCascade")]
+    partial class UpdateCascade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,16 +209,11 @@ namespace AIDentify.Migrations
                     b.Property<string>("XRayScanId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("XRayScanId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PatientId");
 
                     b.HasIndex("XRayScanId");
-
-                    b.HasIndex("XRayScanId1");
 
                     b.ToTable("MedicalHistory");
                 });
@@ -714,13 +712,8 @@ namespace AIDentify.Migrations
                         .HasForeignKey("PatientId");
 
                     b.HasOne("AIDentify.Models.XRayScan", "XRayScan")
-                        .WithMany()
-                        .HasForeignKey("XRayScanId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AIDentify.Models.XRayScan", null)
                         .WithMany("MedicalHistories")
-                        .HasForeignKey("XRayScanId1");
+                        .HasForeignKey("XRayScanId");
 
                     b.Navigation("Patient");
 
@@ -748,8 +741,7 @@ namespace AIDentify.Migrations
                 {
                     b.HasOne("AIDentify.Models.Doctor", "Doctor")
                         .WithMany("patients")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("DoctorId");
 
                     b.Navigation("Doctor");
                 });
