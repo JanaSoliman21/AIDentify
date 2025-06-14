@@ -14,7 +14,6 @@ namespace AIDentify.Models
 
         [ValidateNever]
         [ForeignKey(nameof(PatientId))]
-        [JsonIgnore]
         public Patient? Patient { get; set; }
 
         public string? XRayScanId { get; set; }
@@ -23,6 +22,7 @@ namespace AIDentify.Models
         [ForeignKey(nameof(XRayScanId))]
         [JsonIgnore]
         public XRayScan? XRayScan { get; set; }
+
 
         [ValidateNever]
         public byte[]? DiseasePrediction { get; set; }

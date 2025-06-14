@@ -127,7 +127,7 @@ namespace AIDentify.Controllers
             var patientEntity = await patient.GetByIdAsync(dto.PatientId);
             if (patientEntity == null || patientEntity.DoctorId != userId)
                 return BadRequest("Invalid or unauthorized patient.");
-
+            
             var history = new MedicalHistory
             {
                 Id = id_Generator.GenerateId<MedicalHistory>(ModelPrefix.MedicalHistory),
