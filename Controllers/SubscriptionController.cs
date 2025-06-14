@@ -301,7 +301,7 @@ namespace AIDentify.Controllers
             payment.PaymentDate = DateTime.Now;
 
             // Set initial status
-            payment.Status = PaymentStatus.Pending;
+            payment.Status = PaymentStatus.Completed;
 
             //// create a new subscription
             // set the subscription id
@@ -418,11 +418,15 @@ namespace AIDentify.Controllers
                     return BadRequest("New plan not found.");
                 }
                 var newPlan = PlanRepository.Get(newPlanId);
+                
                 // Payment Check
                 if (payment.Amount != newPlan.Price)
                 {
                     return BadRequest("Payment amount does not match the plan price.");
                 }
+
+                // Set initial status
+                payment.Status = PaymentStatus.Completed;
             }
             else
             {
